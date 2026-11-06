@@ -1,0 +1,517 @@
+/* css/pricing.css — stile "reale" per Pacchetti e Prezzi + piccoli aiuti per form/modale.
+   Caricato DOPO style.css e responsive.css. */
+
+:root {
+  --rp-night: #12072e;
+  --rp-royal: #2a1467;
+  --rp-violet: #6d4aff;
+  --rp-gold: #e6c170;
+  --rp-gold-deep: #c99a2e;
+  --rp-text: #f4efff;
+  --rp-muted: #c4b8e8;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* ---------- Animazione "reveal" allo scroll ---------- */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.js [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.rp-grid .rp-card:nth-child(2) {
+  transition-delay: 0.1s;
+}
+
+.rp-grid .rp-card:nth-child(3) {
+  transition-delay: 0.2s;
+}
+
+.rp-grid .rp-card:nth-child(4) {
+  transition-delay: 0.3s;
+}
+
+/* ---------- Sezione prezzi ---------- */
+.rp-section {
+  position: relative;
+  overflow: hidden;
+  padding: 110px 0;
+  color: var(--rp-text);
+  background:
+    radial-gradient(circle at 15% 10%, rgba(109, 74, 255, 0.35), transparent 45%),
+    radial-gradient(circle at 85% 90%, rgba(230, 193, 112, 0.14), transparent 45%),
+    linear-gradient(160deg, var(--rp-night), var(--rp-royal));
+}
+
+.rp-section::before {
+  /* puntini dorati sullo sfondo */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(230, 193, 112, 0.18) 1px, transparent 1px);
+  background-size: 34px 34px;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.rp-section .container {
+  position: relative;
+  z-index: 1;
+}
+
+.rp-heading {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 60px;
+}
+
+.rp-eyebrow {
+  display: inline-block;
+  padding: 6px 16px;
+  border: 1px solid var(--rp-gold);
+  border-radius: 999px;
+  color: var(--rp-gold);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+.rp-heading h2 {
+  margin: 18px 0 14px;
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: #fff;
+  line-height: 1.15;
+}
+
+.rp-heading p {
+  color: var(--rp-muted);
+  font-size: 1.05rem;
+}
+
+.rp-gold {
+  background: linear-gradient(90deg, #f6e1a6, var(--rp-gold-deep), #f6e1a6);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: rp-shine 4s linear infinite;
+}
+
+@keyframes rp-shine {
+  to {
+    background-position: 200% center;
+  }
+}
+
+/* ---------- Griglia e card ---------- */
+.rp-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  align-items: stretch;
+}
+
+.rp-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 32px 26px 28px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
+  border: 1px solid rgba(230, 193, 112, 0.35);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+.rp-card:hover {
+  transform: translateY(-10px);
+  border-color: var(--rp-gold);
+  box-shadow: 0 30px 70px rgba(109, 74, 255, 0.45);
+}
+
+.rp-icon {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  font-size: 1.6rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(230, 193, 112, 0.25), rgba(109, 74, 255, 0.35));
+  border: 1px solid rgba(230, 193, 112, 0.5);
+  margin-bottom: 18px;
+}
+
+.rp-card h3 {
+  color: #fff;
+  font-size: 1.35rem;
+  margin: 0 0 6px;
+}
+
+.rp-sub {
+  color: var(--rp-muted);
+  font-size: 0.92rem;
+  margin: 0 0 18px;
+  min-height: 2.6em;
+}
+
+.rp-price {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--rp-gold);
+  margin-bottom: 22px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(230, 193, 112, 0.25);
+}
+
+.rp-price small {
+  font-size: 0.9rem;
+  color: var(--rp-muted);
+  font-weight: 500;
+}
+
+.rp-price em {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.8rem;
+  font-style: normal;
+  color: var(--rp-muted);
+  font-weight: 400;
+}
+
+.rp-card h4 {
+  margin: 4px 0 10px;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--rp-gold);
+}
+
+.rp-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 18px;
+}
+
+.rp-list li {
+  position: relative;
+  padding-left: 22px;
+  margin-bottom: 9px;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--rp-text);
+}
+
+.rp-list li::before {
+  content: "◆";
+  position: absolute;
+  left: 0;
+  top: 1px;
+  font-size: 0.65rem;
+  color: var(--rp-violet);
+}
+
+.rp-check li::before {
+  content: "✓";
+  font-size: 0.85rem;
+  color: var(--rp-gold);
+  font-weight: 700;
+}
+
+/* Blocchi INPUT → OUTPUT (card Automazioni) */
+.rp-io {
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px dashed rgba(230, 193, 112, 0.4);
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.rp-io p {
+  margin: 3px 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--rp-text);
+}
+
+.rp-in,
+.rp-out {
+  display: inline-block;
+  min-width: 62px;
+  margin-right: 6px;
+  padding: 1px 8px;
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+
+.rp-in {
+  background: rgba(109, 74, 255, 0.55);
+  color: #fff;
+}
+
+.rp-out {
+  background: rgba(230, 193, 112, 0.9);
+  color: #2a1467;
+}
+
+/* Bottoni */
+.rp-btn {
+  margin-top: auto;
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  padding: 14px 18px;
+  border-radius: 12px;
+  font-weight: 600;
+  color: #fff;
+  border: 1px solid var(--rp-gold);
+  transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+
+.rp-btn:hover {
+  background: var(--rp-gold);
+  color: var(--rp-night);
+  transform: scale(1.03);
+}
+
+.rp-btn-gold {
+  background: linear-gradient(135deg, #f6e1a6, var(--rp-gold-deep));
+  color: var(--rp-night);
+  border-color: transparent;
+}
+
+/* Card in evidenza: bordo dorato animato + corona */
+.rp-featured {
+  transform: scale(1.04);
+  border-color: transparent;
+  background:
+    linear-gradient(180deg, #3a1d8f, #241055) padding-box,
+    linear-gradient(120deg, #f6e1a6, var(--rp-violet), var(--rp-gold-deep), #f6e1a6) border-box;
+  background-size: 100% 100%, 300% 300%;
+  animation: rp-border 6s linear infinite;
+  box-shadow: 0 30px 80px rgba(109, 74, 255, 0.5);
+}
+
+.rp-featured:hover {
+  transform: scale(1.04) translateY(-10px);
+}
+
+@keyframes rp-border {
+
+  0%,
+  100% {
+    background-position: 0 0, 0% 50%;
+  }
+
+  50% {
+    background-position: 0 0, 100% 50%;
+  }
+}
+
+.rp-crown {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 16px;
+  border-radius: 999px;
+  white-space: nowrap;
+  background: linear-gradient(135deg, #f6e1a6, var(--rp-gold-deep));
+  color: var(--rp-night);
+  font-size: 0.78rem;
+  font-weight: 700;
+  animation: rp-float 3s ease-in-out infinite;
+}
+
+@keyframes rp-float {
+  50% {
+    transform: translateX(-50%) translateY(-5px);
+  }
+}
+
+.rp-note {
+  max-width: 760px;
+  margin: 50px auto 0;
+  text-align: center;
+  color: var(--rp-muted);
+  font-size: 0.9rem;
+}
+
+.rp-note strong {
+  color: var(--rp-gold);
+}
+
+/* ---------- Servizi (griglia semplice) ---------- */
+.svc-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.svc-card {
+  padding: 28px;
+  border-radius: 18px;
+  background: #fff;
+  border: 1px solid #ebe6ff;
+  box-shadow: 0 8px 24px rgba(109, 74, 255, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.svc-card:hover {
+  background: #eae3ff;
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px rgba(109, 74, 255, 0.2);
+}
+
+.svc-ico {
+  display: inline-block;
+  font-size: 1.8rem;
+  margin-bottom: 12px;
+}
+
+.svc-card h3 {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+}
+
+.svc-card p {
+  margin: 0;
+  color: #5b5675;
+  line-height: 1.55;
+  font-size: 0.95rem;
+}
+
+/* ---------- Form: errori, spinner, honeypot, shake ---------- */
+.hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.field-error {
+  display: block;
+  min-height: 1em;
+  margin-top: 4px;
+  color: #d92d5a;
+  font-size: 0.8rem;
+}
+
+.input-invalid {
+  border-color: #d92d5a !important;
+}
+
+.contact-form.shake {
+  animation: rp-shake 0.45s;
+}
+
+@keyframes rp-shake {
+
+  20%,
+  60% {
+    transform: translateX(-8px);
+  }
+
+  40%,
+  80% {
+    transform: translateX(8px);
+  }
+}
+
+.btn-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
+  vertical-align: -3px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: rp-spin 0.7s linear infinite;
+}
+
+@keyframes rp-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.modal-actions a {
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: var(--rp-violet);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1100px) {
+  .rp-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .rp-featured,
+  .rp-featured:hover {
+    transform: none;
+  }
+
+  .svc-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .rp-section {
+    padding: 80px 0;
+  }
+
+  .rp-grid,
+  .svc-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rp-crown {
+    top: -14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .js [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
