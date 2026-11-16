@@ -1,26 +1,26 @@
 /* ==========================================================================
    SmartRoutine Studio — Main Design System Stylesheet
-   Palette: Primary #6D4AFF | Deep #5035C9 | Lavender #F3F0FF | Text #191827
+   Palette: Primary #C96442 | Deep #B4532F | Lavender #F5E9E1 | Text #141413
    ========================================================================== */
 
 :root {
-  --primary: #6D4AFF;
-  --primary-hover: #5035C9;
-  --lavender: #F3F0FF;
-  --lavender-subtle: #FAF8FF;
+  --primary: #C96442;
+  --primary-hover: #B4532F;
+  --lavender: #F5E9E1;
+  --lavender-subtle: #F0EEE6;
   --white: #FFFFFF;
-  --text-main: #191827;
-  --text-secondary: #686779;
-  --border-light: #E8E5F0;
-  --border-subtle: #F0EDF7;
+  --text-main: #141413;
+  --text-secondary: #5E5D59;
+  --border-light: #E5E2D6;
+  --border-subtle: #EEEBE1;
   --success: #10B981;
   --error: #EF4444;
   --whatsapp: #25D366;
   --whatsapp-hover: #1EBE5D;
   
-  --shadow-sm: 0 2px 8px rgba(25, 24, 39, 0.04);
-  --shadow-md: 0 10px 30px rgba(109, 74, 255, 0.08);
-  --shadow-lg: 0 20px 40px rgba(25, 24, 39, 0.12);
+  --shadow-sm: 0 2px 8px rgba(20, 20, 19, 0.04);
+  --shadow-md: 0 10px 30px rgba(201, 100, 66, 0.08);
+  --shadow-lg: 0 20px 40px rgba(20, 20, 19, 0.12);
   
   --radius-sm: 8px;
   --radius-md: 14px;
@@ -43,7 +43,7 @@ html {
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: #FCFCFE;
+  background-color: #FAF9F5;
   color: var(--text-main);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -126,13 +126,13 @@ p {
 .button-primary {
   background-color: var(--primary);
   color: var(--white);
-  box-shadow: 0 4px 14px rgba(109, 74, 255, 0.3);
+  box-shadow: 0 4px 14px rgba(201, 100, 66, 0.3);
 }
 
 .button-primary:hover {
   background-color: var(--primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(109, 74, 255, 0.4);
+  box-shadow: 0 6px 20px rgba(201, 100, 66, 0.4);
 }
 
 .button-outline {
@@ -244,13 +244,13 @@ p {
 .glow-1 {
   top: -100px;
   right: -100px;
-  background-color: #E2DBFF;
+  background-color: #EBCFC0;
 }
 
 .glow-2 {
   bottom: -150px;
   left: -150px;
-  background-color: #F3F0FF;
+  background-color: #F5E9E1;
 }
 
 .hero-grid {
@@ -278,7 +278,7 @@ p {
   height: 8px;
   background-color: var(--primary);
   border-radius: 50%;
-  box-shadow: 0 0 0 3px rgba(109, 74, 255, 0.2);
+  box-shadow: 0 0 0 3px rgba(201, 100, 66, 0.2);
 }
 
 .hero-title {
@@ -323,7 +323,7 @@ p {
 }
 
 .window-header {
-  background-color: #F8F7FC;
+  background-color: #F5F4ED;
   padding: 12px 16px;
   display: flex;
   align-items: center;
@@ -671,7 +671,7 @@ p {
 .step-num {
   font-size: 36px;
   font-weight: 700;
-  color: #E2DBFF;
+  color: #EBCFC0;
   margin-bottom: 16px;
 }
 
@@ -834,7 +834,7 @@ p {
   font-family: inherit;
   font-size: 14px;
   color: var(--text-main);
-  background-color: #FAFAFD;
+  background-color: #FAF9F5;
   transition: var(--transition);
 }
 
@@ -844,7 +844,7 @@ p {
   outline: none;
   border-color: var(--primary);
   background-color: var(--white);
-  box-shadow: 0 0 0 3px rgba(109, 74, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(201, 100, 66, 0.15);
 }
 
 .form-group.has-error input,
@@ -898,7 +898,7 @@ p {
 /* Final CTA Section */
 .final-cta-section {
   padding: 100px 0;
-  background: linear-gradient(135deg, #5035C9 0%, #6D4AFF 100%);
+  background: linear-gradient(135deg, #B4532F 0%, #C96442 100%);
   color: var(--white);
 }
 
@@ -934,7 +934,7 @@ p {
 
 /* Footer */
 .footer {
-  background-color: #12111D;
+  background-color: #141413;
   color: var(--white);
   padding: 80px 0 30px 0;
 }
@@ -953,7 +953,7 @@ p {
 }
 
 .footer-brand p {
-  color: #9291A2;
+  color: #8F8D86;
   font-size: 14px;
   max-width: 320px;
 }
@@ -976,7 +976,7 @@ p {
 }
 
 .footer-nav a {
-  color: #9291A2;
+  color: #8F8D86;
   text-decoration: none;
   font-size: 14px;
   transition: var(--transition);
@@ -987,7 +987,7 @@ p {
 }
 
 .footer-contact p {
-  color: #9291A2;
+  color: #8F8D86;
   font-size: 14px;
   margin-bottom: 8px;
 }
@@ -999,10 +999,10 @@ p {
 
 .footer-bottom {
   padding-top: 30px;
-  border-top: 1px solid #232135;
+  border-top: 1px solid #2E2D2A;
   text-align: center;
   font-size: 13px;
-  color: #9291A2;
+  color: #8F8D86;
 }
 
 /* Floating WhatsApp Button */
@@ -1031,7 +1031,7 @@ p {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background-color: rgba(25, 24, 39, 0.6);
+  background-color: rgba(20, 20, 19, 0.6);
   backdrop-filter: blur(4px);
   z-index: 2000;
   display: flex;
@@ -1107,12 +1107,12 @@ p {
    ========================================================================== */
 
 .pricing-section {
-  --offer-night: #0F0826;
-  --offer-royal: #24125C;
-  --offer-gold: #E6C170;
-  --offer-gold-deep: #C99A2E;
-  --offer-text: #F4EFFF;
-  --offer-muted: #B9AEDB;
+  --offer-night: #141413;
+  --offer-royal: #1F1E1C;
+  --offer-gold: #D97757;
+  --offer-gold-deep: #C96442;
+  --offer-text: #F5F4ED;
+  --offer-muted: #B7B5A9;
   --offer-line: rgba(255, 255, 255, 0.10);
 
   position: relative;
@@ -1121,8 +1121,8 @@ p {
   padding: 120px 0 110px;
   border: none;
   background:
-    radial-gradient(900px 480px at 15% -10%, rgba(109, 74, 255, 0.45), transparent 60%),
-    radial-gradient(700px 420px at 100% 110%, rgba(230, 193, 112, 0.16), transparent 60%),
+    radial-gradient(900px 480px at 15% -10%, rgba(201, 100, 66, 0.45), transparent 60%),
+    radial-gradient(700px 420px at 100% 110%, rgba(217, 119, 87, 0.16), transparent 60%),
     linear-gradient(180deg, var(--offer-night) 0%, var(--offer-royal) 100%);
   color: var(--offer-text);
 }
@@ -1144,9 +1144,9 @@ p {
 .pricing-section .section-tag {
   color: var(--offer-gold);
   padding: 6px 14px;
-  border: 1px solid rgba(230, 193, 112, 0.35);
+  border: 1px solid rgba(217, 119, 87, 0.35);
   border-radius: var(--radius-pill);
-  background: rgba(230, 193, 112, 0.08);
+  background: rgba(217, 119, 87, 0.08);
   margin-bottom: 20px;
 }
 
@@ -1175,22 +1175,22 @@ p {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.025) 100%);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 24px 60px rgba(5, 2, 20, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .pricing-section .pricing-card:hover {
   transform: translateY(-6px);
   border-color: rgba(255, 255, 255, 0.22);
-  box-shadow: 0 32px 70px rgba(5, 2, 20, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  box-shadow: 0 32px 70px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 /* Featured card: gold gradient border, raised, placed in the middle on desktop */
 .pricing-section .pricing-card.featured {
   border: 1px solid transparent;
   background:
-    linear-gradient(180deg, #2B1773 0%, #1A0D47 100%) padding-box,
-    linear-gradient(160deg, var(--offer-gold) 0%, rgba(109, 74, 255, 0.9) 45%, var(--offer-gold-deep) 100%) border-box;
-  box-shadow: 0 30px 80px rgba(109, 74, 255, 0.35), 0 0 0 1px rgba(230, 193, 112, 0.15);
+    linear-gradient(180deg, #2A2825 0%, #141413 100%) padding-box,
+    linear-gradient(160deg, var(--offer-gold) 0%, rgba(201, 100, 66, 0.9) 45%, var(--offer-gold-deep) 100%) border-box;
+  box-shadow: 0 30px 80px rgba(201, 100, 66, 0.35), 0 0 0 1px rgba(217, 119, 87, 0.15);
   transform: translateY(-14px);
 }
 
@@ -1210,9 +1210,9 @@ p {
   padding: 7px 16px;
   font-size: 10.5px;
   letter-spacing: 1.2px;
-  color: #1A0D47;
-  background: linear-gradient(135deg, #F6DFA4 0%, var(--offer-gold) 50%, var(--offer-gold-deep) 100%);
-  box-shadow: 0 8px 24px rgba(230, 193, 112, 0.35);
+  color: #141413;
+  background: linear-gradient(135deg, #ECA488 0%, var(--offer-gold) 50%, var(--offer-gold-deep) 100%);
+  box-shadow: 0 8px 24px rgba(217, 119, 87, 0.35);
 }
 
 .pricing-section .pricing-card h3 {
@@ -1244,7 +1244,7 @@ p {
 }
 
 .pricing-section .pricing-card.featured .price-tag {
-  background: linear-gradient(135deg, #FFFFFF 0%, #F6DFA4 60%, var(--offer-gold) 100%);
+  background: linear-gradient(135deg, #FFFFFF 0%, #ECA488 60%, var(--offer-gold) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -1281,13 +1281,13 @@ p {
   border-radius: 50%;
   font-size: 11px;
   color: #FFFFFF;
-  background: rgba(109, 74, 255, 0.55);
+  background: rgba(201, 100, 66, 0.55);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
 }
 
 .pricing-section .pricing-card.featured .pricing-inclusions li::before {
-  color: #1A0D47;
-  background: linear-gradient(135deg, #F6DFA4, var(--offer-gold));
+  color: #141413;
+  background: linear-gradient(135deg, #ECA488, var(--offer-gold));
 }
 
 /* Buttons inside the dark section */
@@ -1302,20 +1302,20 @@ p {
 }
 
 .pricing-section .pricing-card .button-outline:hover {
-  color: #1A0D47;
+  color: #141413;
   background: #FFFFFF;
   border-color: #FFFFFF;
 }
 
 .pricing-section .pricing-card .button-primary {
-  color: #1A0D47;
-  background: linear-gradient(135deg, #F6DFA4 0%, var(--offer-gold) 55%, var(--offer-gold-deep) 100%);
-  box-shadow: 0 10px 28px rgba(230, 193, 112, 0.3);
+  color: #141413;
+  background: linear-gradient(135deg, #ECA488 0%, var(--offer-gold) 55%, var(--offer-gold-deep) 100%);
+  box-shadow: 0 10px 28px rgba(217, 119, 87, 0.3);
 }
 
 .pricing-section .pricing-card .button-primary:hover {
-  background: linear-gradient(135deg, #FFF0C8 0%, #EECB80 55%, var(--offer-gold) 100%);
-  box-shadow: 0 14px 34px rgba(230, 193, 112, 0.42);
+  background: linear-gradient(135deg, #F2B79F 0%, #E08A6A 55%, var(--offer-gold) 100%);
+  box-shadow: 0 14px 34px rgba(217, 119, 87, 0.42);
 }
 
 /* Transparency note */
@@ -1344,4 +1344,55 @@ p {
     transition: none;
     transform: none;
   }
+}
+
+/* ==========================================================================
+   Warm theme typography & icon tint (Claude-inspired: cream, ink, clay)
+   ========================================================================== */
+
+:root {
+  --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+h4 {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.section-tag,
+.status-badge,
+.window-title,
+.step-status,
+.featured-badge,
+.price-tag small {
+  font-family: var(--font-mono);
+}
+
+.section-tag {
+  letter-spacing: 0.14em;
+}
+
+.pricing-section .price-tag {
+  font-family: var(--font-serif);
+  font-weight: 600;
+}
+
+/* Inline SVG icons in the markup use the old violet stroke; tint them clay */
+svg[stroke="#6D4AFF"] {
+  stroke: var(--primary);
+}
+
+::selection {
+  background: rgba(217, 119, 87, 0.25);
+  color: var(--text-main);
 }
