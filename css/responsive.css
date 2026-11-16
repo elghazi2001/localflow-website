@@ -101,3 +101,36 @@
     flex-direction: column;
   }
 }
+
+/* Premium offer section */
+@media (max-width: 992px) {
+  .pricing-section .pricing-grid {
+    grid-template-columns: 1fr;
+    max-width: 520px;
+    margin: 56px auto 40px;
+    gap: 36px;
+  }
+
+  .pricing-section .pricing-card.featured,
+  .pricing-section .pricing-card.featured:hover {
+    transform: none;
+  }
+
+  .pricing-section .pricing-card .pricing-desc {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .pricing-section {
+    padding: 88px 0 80px;
+  }
+
+  .pricing-section .pricing-card {
+    padding: 40px 22px 26px;
+  }
+
+  .pricing-section .price-tag {
+    font-size: 38px;
+  }
+}

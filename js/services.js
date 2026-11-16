@@ -87,34 +87,6 @@
       ctaText: "Automatizza un Processo"
     },
     {
-      title: "Integrazione IA Pratica",
-      price: `€${prices.aiIntegration || 250}`,
-      desc: "Introduce l'IA in un flusso specifico senza rendere complesse le tue operazioni abituali.",
-      featured: false,
-      inclusions: [
-        "Un flusso assistito da IA concordato",
-        "Integrazione con servizio IA idoneo",
-        "Configurazione prompt ed output",
-        "Test su casi reali rappresentativi",
-        "Guida pratica all'uso"
-      ],
-      ctaText: "Integra l'IA nel Lavoro"
-    },
-    {
-      title: "Sito Web Professionale",
-      price: `€${prices.website || 350}`,
-      desc: "Un sito web chiaro e moderno che spiega i tuoi servizi e facilita il contatto da parte dei clienti.",
-      featured: false,
-      inclusions: [
-        "Sito web per piccola attività",
-        "Layout totalmente responsive",
-        "Sezione e modulo di contatto",
-        "Ottimizzazione SEO fondamentale",
-        "Assistenza al deployment online"
-      ],
-      ctaText: "Crea il Tuo Sito Web"
-    },
-    {
       title: "Soluzione Personalizzata",
       price: prices.custom || "Su Preventivo",
       desc: "Hai un problema articolato? Progettiamo uno strumento digitale su misura per la tua operatività.",
