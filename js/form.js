@@ -1,12 +1,23 @@
 /**
- * SmartRoutine Studio — Contact Form / Web3Forms
- * Each step is isolated to make troubleshooting straightforward.
+ * SmartRoutine Studio — Contact Form
+ * Primary delivery: Google Apps Script (logs to Google Doc + HTML email).
+ * Fallback delivery: Web3Forms (plain-text email) so no request is lost.
  */
 (function () {
   "use strict";
 
   const WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit";
   const formConfig = window.SR_CONFIG || {};
+  const COOLDOWN_MS = Number(formConfig.submitCooldownMs) || 30000;
+  const MIN_FILL_MS = 3000;
+  const REQUEST_TIMEOUT_MS = 20000;
+  const FIELDS = [
+    "name", "business", "email", "phone", "business_type",
+    "service_interest", "budget_range", "contact_preference", "problem_description"
+  ];
+
+  let formShownAt = Date.now();
+  let lastSubmitAt = 0;
 
   function getFormElements() {
     const form = document.getElementById("mainContactForm");
@@ -21,7 +32,7 @@
   }
 
   function validateEmail(email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    return email.length <= 254 && /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(email);
   }
 
   function clearErrors(form) {
@@ -81,6 +92,14 @@
       valid = false;
     }
 
+    // Enforce maxlength even if someone edits the DOM.
+    FIELDS.forEach(field => {
+      const el = form.elements.namedItem(field);
+      if (el && el.maxLength > 0 && el.value.length > el.maxLength) {
+        el.value = el.value.slice(0, el.maxLength);
+      }
+    });
+
     return valid;
   }
 
@@ -96,8 +115,57 @@
     }
   }
 
-  function buildEmailMessage(formData) {
-    const value = field => formData.get(field) || "Non specificato";
+  function collectData(form) {
+    const data = {};
+    FIELDS.forEach(field => {
+      const el = form.elements.namedItem(field);
+      data[field] = el ? String(el.value || "").trim() : "";
+    });
+    data.consent = form.elements.namedItem("consent").checked;
+    const honeypot = form.elements.namedItem("botcheck");
+    data.botcheck = honeypot ? honeypot.value : "";
+    return data;
+  }
+
+  async function fetchWithTimeout(url, options) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    try {
+      return await fetch(url, { ...options, signal: controller.signal });
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  // --- Primary: Google Apps Script (Doc log + HTML email) ---
+  async function sendToAppsScript(data) {
+    const body = JSON.stringify({
+      ...data,
+      token: formConfig.requestToken || "",
+      elapsed_ms: Date.now() - formShownAt,
+      page: window.location.origin + window.location.pathname
+    });
+    // text/plain keeps this a "simple" CORS request (no preflight), which Apps Script requires.
+    const response = await fetchWithTimeout(formConfig.requestEndpoint, {
+      method: "POST",
+      body,
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      redirect: "follow",
+      credentials: "omit"
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || result.success !== true) {
+      const error = new Error(result.message || `Invio non riuscito (HTTP ${response.status}).`);
+      // A validation/rate-limit answer from the server should be shown, not retried elsewhere.
+      error.fromServer = Boolean(result.message);
+      throw error;
+    }
+    return result;
+  }
+
+  // --- Fallback: Web3Forms (plain text) ---
+  function buildEmailMessage(data) {
+    const value = field => data[field] || "Non specificato";
     const timestamp = new Date().toLocaleString("it-IT");
 
     return [
@@ -118,31 +186,30 @@
       "",
       "[DESCRIZIONE DEL PROBLEMA / ESIGENZA]",
       value("problem_description"),
-      "--------------------------------------------------------"
+      "--------------------------------------------------------",
+      "(Inviata tramite Web3Forms: il registro Google Doc non è stato aggiornato.)"
     ].join("\n");
   }
 
-  function buildWeb3FormsPayload(form) {
-    const payload = new FormData(form);
-    const name = String(payload.get("name") || "").trim();
-    const service = payload.get("service_interest") || "Inchiesta Generica";
-
-    // Web3Forms requires access_key and accepts a message field.
-    payload.set("access_key", payload.get("access_key") || "");
-    payload.set("message", buildEmailMessage(payload));
+  async function sendToWeb3Forms(form, data) {
+    const payload = new FormData();
+    const accessKey = form.elements.namedItem("access_key");
+    payload.set("access_key", accessKey ? accessKey.value : "");
+    FIELDS.forEach(field => payload.set(field, data[field]));
+    payload.set("botcheck", data.botcheck ? "true" : "");
+    payload.set("message", buildEmailMessage(data));
+    payload.set("replyto", data.email);
+    payload.set("from_name", "SmartRoutine Studio · Sito");
     payload.set(
       "subject",
-      `Nuovo Progetto SmartRoutine: ${name} (${service})`
+      `Nuova richiesta da ${data.name} · ${data.service_interest || "Richiesta generica"}`
     );
 
-    return payload;
-  }
-
-  async function sendEmail(payload) {
-    const response = await fetch(WEB3FORMS_ENDPOINT, {
+    const response = await fetchWithTimeout(WEB3FORMS_ENDPOINT, {
       method: "POST",
       body: payload,
-      headers: { Accept: "application/json" }
+      headers: { Accept: "application/json" },
+      credentials: "omit"
     });
 
     const result = await response.json().catch(() => ({}));
@@ -150,6 +217,18 @@
       throw new Error(result.message || `Invio non riuscito (HTTP ${response.status}).`);
     }
     return result;
+  }
+
+  async function deliver(form, data) {
+    if (formConfig.requestEndpoint) {
+      try {
+        return await sendToAppsScript(data);
+      } catch (error) {
+        if (error.fromServer) throw error;
+        console.warn("Apps Script non raggiungibile, uso Web3Forms:", error);
+      }
+    }
+    return sendToWeb3Forms(form, data);
   }
 
   function getWhatsAppURL() {
@@ -160,7 +239,16 @@
     return `https://wa.me/${number}?text=${message}`;
   }
 
-  function showModal(isSuccess, title, message, actionsHTML) {
+  function makeButton(label, className) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = className;
+    button.textContent = label;
+    button.addEventListener("click", () => window.closeModal());
+    return button;
+  }
+
+  function showModal(isSuccess, title, message, actionNodes) {
     const modal = document.getElementById("statusModal");
     if (!modal) return;
 
@@ -175,7 +263,7 @@
     }
     if (titleElement) titleElement.textContent = title;
     if (body) body.textContent = message;
-    if (actions) actions.innerHTML = actionsHTML || "";
+    if (actions) actions.replaceChildren(...(actionNodes || []));
 
     modal.hidden = false;
   }
@@ -185,35 +273,59 @@
       true,
       "Messaggio Inviato con Successo!",
       "Grazie per aver contattato SmartRoutine Studio. La tua richiesta è stata ricevuta correttamente. Ti risponderemo entro 24 ore lavorative.",
-      '<button class="button button-primary" onclick="window.closeModal()">Chiudi</button>'
+      [makeButton("Chiudi", "button button-primary")]
     );
   }
 
-  function showFailure() {
+  function showFailure(message) {
+    const whatsapp = document.createElement("a");
+    whatsapp.href = getWhatsAppURL();
+    whatsapp.className = "button button-whatsapp";
+    whatsapp.target = "_blank";
+    whatsapp.rel = "noopener noreferrer";
+    whatsapp.textContent = "Scrivi su WhatsApp";
+
     showModal(
       false,
       "Impossibile Inviare il Messaggio",
-      "Si è verificato un problema durante l'invio. Le informazioni sono ancora nel modulo: puoi riprovare o contattarci direttamente su WhatsApp.",
-      `<button class="button button-outline" onclick="window.closeModal()">Chiudi</button>
-       <a href="${getWhatsAppURL()}" class="button button-whatsapp" target="_blank" rel="noopener noreferrer">Scrivi su WhatsApp</a>`
+      message ||
+        "Si è verificato un problema durante l'invio. Le informazioni sono ancora nel modulo: puoi riprovare o contattarci direttamente su WhatsApp.",
+      [makeButton("Chiudi", "button button-outline"), whatsapp]
     );
   }
 
   async function handleSubmit(event, elements) {
     event.preventDefault();
     const { form } = elements;
+    if (elements.submitButton.disabled) return;
 
     clearErrors(form);
     if (!validateForm(form)) return;
 
-    setLoading(elements, true);
-    try {
-      await sendEmail(buildWeb3FormsPayload(form));
+    const data = collectData(form);
+    const now = Date.now();
+
+    // Bots: filled honeypot or inhumanly fast. Pretend success, send nothing.
+    if (data.botcheck || now - formShownAt < MIN_FILL_MS) {
       form.reset();
       showSuccess();
+      return;
+    }
+    if (now - lastSubmitAt < COOLDOWN_MS) {
+      showFailure("Hai appena inviato una richiesta. Attendi qualche secondo prima di inviarne un'altra.");
+      return;
+    }
+
+    setLoading(elements, true);
+    try {
+      await deliver(form, data);
+      lastSubmitAt = Date.now();
+      form.reset();
+      formShownAt = Date.now();
+      showSuccess();
     } catch (error) {
-      console.error("Errore invio Web3Forms:", error);
-      showFailure();
+      console.error("Errore invio modulo:", error);
+      showFailure(error.fromServer ? error.message : "");
     } finally {
       setLoading(elements, false);
     }
@@ -223,6 +335,7 @@
     const elements = getFormElements();
     if (!elements || !elements.submitButton) return;
 
+    formShownAt = Date.now();
     elements.form.addEventListener("submit", event => {
       handleSubmit(event, elements);
     });

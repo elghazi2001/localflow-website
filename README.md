@@ -7,6 +7,8 @@ Official production-ready frontend for **SmartRoutine Studio**, an independent c
 ```text
 SmartRoutine-Studio/
 ├── index.html              # Main semantic HTML5 file (Italian)
+├── mockup.html             # Placeholder for the future mockup generator
+├── apps-script/            # Google Apps Script: Doc log + HTML email
 ├── README.md               # Documentation & setup guide
 ├── assets/
 │   ├── logo.svg            # Custom SVG logo with purple workflow node icon
@@ -29,33 +31,32 @@ You can edit business variables without modifying HTML or core code:
 
 ```javascript
 window.SR_CONFIG = {
-  brandName: "SmartRoutine Studio",
-  tagline: "Strumenti digitali su misura, automazioni e integrazioni IA pratiche per attività locali.",
-  contactEmail: "info@smartroutinestudio.com",
-  whatsappNumber: "393000000000",
-  whatsappDefaultMessage: "Ciao SmartRoutine Studio! Vorrei discutere un problema...",
-  pricing: {
-    bookingSystem: 400,
-    automation: 150,
-    aiIntegration: 250,
-    website: 350,
-    custom: "Su Preventivo"
-  }
+  contactEmail: "elghazifarouk112@gmail.com",
+  whatsappNumber: "+393281016993",
+  pricing: { website: 372, bookingSystem: 450, automation: 150, aiIntegration: 400, custom: "Su Preventivo" },
+  requestEndpoint: "https://script.google.com/macros/s/…/exec", // Apps Script Web App URL
+  requestToken: "srs-2026-form",                               // must match FORM_TOKEN in Code.gs
+  submitCooldownMs: 30000
 };
 ```
 
-## ✉️ Email Delivery (Web3Forms)
+## ✉️ Request Delivery
 
-The contact form submits to `https://api.web3forms.com/submit` using the Web3Forms access key stored in the form's hidden `access_key` field.
+1. **Primary — Google Apps Script** (`apps-script/Code.gs`, deploy guide in `apps-script/README.md`):
+   logs every request in the Google Doc *"Richieste SmartRoutine Studio"* (newest on top, with ID and status)
+   and sends an HTML email with the details, reply/WhatsApp/Doc buttons and a **"Genera mockup del servizio"**
+   button (links to the `mockup.html` placeholder, to be developed).
+2. **Fallback — Web3Forms**: if the Apps Script is not configured or unreachable, the form sends the
+   plain-text email through Web3Forms so no request is lost. Reply-To is set to the customer's email.
 
-- Existing form fields and their names are preserved.
-- The submitted email includes the original contact and project details in a structured Italian message.
-- Client-side validation checks the required fields and consent.
-- The submit button displays its existing loading indicator and is disabled while the request is in progress.
-- Success and failure are reported through the existing status modal.
+## 🔒 Security
 
-The browser-side access key is visible to visitors by design. If it is ever exposed to unwanted traffic, rotate it in your Web3Forms dashboard.
+- Content-Security-Policy and Referrer-Policy meta tags (scripts only from this site; network calls only to Apps Script and Web3Forms).
+- No inline event handlers; dynamic text is set with `textContent`.
+- Honeypot field, minimum fill time and a 30 s client cooldown; server-side length limits, HTML escaping and rate limiting.
+- The Web3Forms access key is public by design: restrict it to your domain in the Web3Forms dashboard.
+- Privacy notice under the consent checkbox (GDPR).
 
 ## 🚀 Deployment
 
-Simply upload all files in this archive to any web server, GitHub Pages, Netlify, or Vercel. No build step or backend node server required.
+Static site, no build step. Published with GitHub Pages from `main` (root): https://elghazi2001.github.io/localflow-website/

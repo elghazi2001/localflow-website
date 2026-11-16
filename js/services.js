@@ -34,7 +34,7 @@
       title: "Automazione ed Organizzazione Email",
       desc: "Strumenti per smistare i messaggi in arrivo, estrarre informazioni chiave ed inviare risposte o avvisi automatici.",
       icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6D4AFF" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>',
-      outcome: "Mantieta la casella zero-stress senza perdere richieste di clienti importanti."
+      outcome: "Mantieni la casella zero-stress senza perdere richieste di clienti importanti."
     },
     {
       title: "Integrazioni IA Pratiche",
@@ -59,7 +59,7 @@
   const packagesData = [
     {
       title: "Sistema di Prenotazione",
-      price: `€${prices.bookingSystem || 400}`,
+      price: `€${prices.bookingSystem || 450}`,
       desc: "Soluzione di prenotazione progettata sulla tua attività per gestire appuntamenti senza caos di messaggi.",
       featured: true,
       inclusions: [
