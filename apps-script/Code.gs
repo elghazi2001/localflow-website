@@ -12,9 +12,6 @@
 // ---------- Settings ----------
 const NOTIFY_EMAIL = "elghazifarouk112@gmail.com";
 const DOC_NAME = "Richieste SmartRoutine Studio";
-// Must match SR_CONFIG.requestToken in js/config.js. Not a real secret (it is
-// visible in the site source) — it only filters random bots hitting the URL.
-const FORM_TOKEN = "srs-2026-form";
 // Placeholder page for the future "Genera mockup del servizio" feature.
 const MOCKUP_BASE_URL = "https://elghazi2001.github.io/localflow-website/mockup.html";
 const SITE_URL = "https://elghazi2001.github.io/localflow-website/";
@@ -24,7 +21,6 @@ const LIMITS = {
   service_interest: 80, budget_range: 60, contact_preference: 30,
   problem_description: 3000
 };
-const MIN_FILL_MS = 3000;           // faster than this = bot
 const PER_EMAIL_COOLDOWN_S = 60;    // one request per email per minute
 const GLOBAL_MAX_PER_10MIN = 20;    // flood protection
 
@@ -33,10 +29,9 @@ function doPost(e) {
   try {
     const data = JSON.parse((e && e.postData && e.postData.contents) || "{}");
 
-    if (data.token !== FORM_TOKEN) return json_({ success: false, message: "Richiesta non valida." });
-
-    // Honeypot / timing: pretend success so bots learn nothing.
-    if (data.botcheck || (Number(data.elapsed_ms) > 0 && Number(data.elapsed_ms) < MIN_FILL_MS)) {
+    // The browser cannot authenticate itself: public frontend tokens and client
+    // timing values are forgeable. Treat the honeypot as a low-confidence signal only.
+    if (data.botcheck) {
       return json_({ success: true });
     }
 
@@ -99,17 +94,42 @@ function validate_(r) {
 }
 
 function rateLimit_(email) {
-  const cache = CacheService.getScriptCache();
-  const emailKey = "e:" + Utilities.base64EncodeWebSafe(email);
-  if (cache.get(emailKey)) return "Hai già inviato una richiesta. Riprova tra un minuto.";
+  // Cache get/put and PropertiesService updates must be serialized; otherwise
+  // simultaneous requests can all read the same count and exceed the limit.
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(10000);
+    const cache = CacheService.getScriptCache();
+    const emailKey = "e:" + Utilities.base64EncodeWebSafe(email);
+    if (cache.get(emailKey)) {
+      return "Hai già inviato una richiesta. Riprova tra un minuto.";
+    }
 
-  const bucket = "g:" + Math.floor(Date.now() / 600000);
-  const count = Number(cache.get(bucket) || 0);
-  if (count >= GLOBAL_MAX_PER_10MIN) return "Troppe richieste in questo momento. Riprova più tardi.";
+    // Keep the global counter in Script Properties rather than cache so cache
+    // eviction cannot silently reset the flood-control bucket.
+    const props = PropertiesService.getScriptProperties();
+    const bucket = String(Math.floor(Date.now() / 600000));
+    const storedBucket = props.getProperty("RATE_LIMIT_BUCKET");
+    const count = storedBucket === bucket
+      ? Number(props.getProperty("RATE_LIMIT_COUNT") || 0)
+      : 0;
 
-  cache.put(emailKey, "1", PER_EMAIL_COOLDOWN_S);
-  cache.put(bucket, String(count + 1), 600);
-  return null;
+    if (count >= GLOBAL_MAX_PER_10MIN) {
+      return "Troppe richieste in questo momento. Riprova più tardi.";
+    }
+
+    cache.put(emailKey, "1", PER_EMAIL_COOLDOWN_S);
+    props.setProperties({
+      RATE_LIMIT_BUCKET: bucket,
+      RATE_LIMIT_COUNT: String(count + 1)
+    });
+    return null;
+  } catch (err) {
+    console.error("Rate limiter unavailable", err);
+    return "Servizio temporaneamente non disponibile. Riprova più tardi.";
+  } finally {
+    if (lock.hasLock()) lock.releaseLock();
+  }
 }
 
 // ---------- Google Doc ----------
