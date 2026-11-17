@@ -53,8 +53,10 @@ window.SR_CONFIG = {
 
 - Content-Security-Policy and Referrer-Policy meta tags (scripts only from this site; network calls only to Apps Script and Web3Forms).
 - No inline event handlers; dynamic text is set with `textContent`.
-- Honeypot field, minimum fill time and a 30 s client cooldown; server-side length limits, HTML escaping and rate limiting.
-- The Web3Forms access key is public by design: restrict it to your domain in the Web3Forms dashboard.
+- Client-side honeypot/cooldown are UX and low-confidence spam signals only. The Apps Script source includes server-side validation and serialized rate limits, but the web app is publicly callable.
+- A public Web3Forms access key is visible in the browser by design; restrict allowed domains in the Web3Forms dashboard and monitor usage.
+- When Apps Script is configured, a network timeout is not automatically retried through Web3Forms: the first provider may already have accepted the request. Check for the notification before resubmitting.
+- CAPTCHA/Turnstile verification, edge-level rate limiting, and HTTP response security headers require external service configuration; see [SECURITY.md](SECURITY.md).
 - Privacy notice under the consent checkbox (GDPR).
 
 ## 🚀 Deployment
