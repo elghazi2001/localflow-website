@@ -1,7 +1,8 @@
 /**
  * SmartRoutine Studio — Contact Form
- * Primary delivery: Google Apps Script (logs to Google Doc + HTML email).
- * Fallback delivery: Web3Forms (plain-text email) so no request is lost.
+ * Google Apps Script is used when configured; otherwise Web3Forms is used.
+ * Transport failures are never retried through a second provider because the
+ * first provider may already have accepted the submission.
  */
 (function () {
   "use strict";
@@ -141,7 +142,6 @@
   async function sendToAppsScript(data) {
     const body = JSON.stringify({
       ...data,
-      token: formConfig.requestToken || "",
       elapsed_ms: Date.now() - formShownAt,
       page: window.location.origin + window.location.pathname
     });
@@ -220,13 +220,10 @@
   }
 
   async function deliver(form, data) {
+    // Do not automatically retry an uncertain Apps Script result via Web3Forms:
+    // the first provider may have stored the request before the connection failed.
     if (formConfig.requestEndpoint) {
-      try {
-        return await sendToAppsScript(data);
-      } catch (error) {
-        if (error.fromServer) throw error;
-        console.warn("Apps Script non raggiungibile, uso Web3Forms:", error);
-      }
+      return sendToAppsScript(data);
     }
     return sendToWeb3Forms(form, data);
   }
@@ -289,7 +286,7 @@
       false,
       "Impossibile Inviare il Messaggio",
       message ||
-        "Si è verificato un problema durante l'invio. Le informazioni sono ancora nel modulo: puoi riprovare o contattarci direttamente su WhatsApp.",
+        "Non è stato possibile confermare l'invio. Per evitare richieste duplicate, controlla prima la posta in arrivo e poi contattaci su WhatsApp se non hai ricevuto conferma. I dati restano nel modulo.",
       [makeButton("Chiudi", "button button-outline"), whatsapp]
     );
   }
