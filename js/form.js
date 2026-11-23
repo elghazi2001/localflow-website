@@ -164,35 +164,26 @@
 
   // --- Fallback: Web3Forms (plain text) ---
   function buildEmailMessage(data) {
-    const value = field => data[field] || "Non specificato";
-    const timestamp = new Date().toLocaleString("it-IT");
-
-    return [
-      "--- NUOVA RICHIESTA DI PROGETTO - SMARTROUTINE STUDIO ---",
-      `Data/Ora: ${timestamp}`,
-      "",
-      "[INFORMAZIONI DI CONTATTO]",
-      `• Nome: ${value("name")}`,
-      `• Email: ${value("email")}`,
-      `• Telefono: ${value("phone")}`,
-      `• Attività: ${value("business")}`,
-      "",
-      "[DETTAGLI RICHIESTA]",
-      `• Servizio di Interesse: ${value("service_interest")}`,
-      `• Quando contattarlo: ${value("preferred_time")}`,
-      "",
-      "[DESCRIZIONE DEL PROBLEMA / ESIGENZA]",
-      value("problem_description"),
-      "--------------------------------------------------------",
-      "(Inviata tramite Web3Forms: il registro Google Doc non è stato aggiornato.)"
-    ].join("\n");
+    const digits = (data.phone || "").replace(/[^0-9]/g, "");
+    const subject = encodeURIComponent("Re: la tua richiesta a SmartRoutine Studio");
+    const lines = [data.problem_description, "", "RISPONDI SUBITO"];
+    lines.push(`Email: mailto:${data.email}?subject=${subject}`);
+    if (digits.length >= 8) lines.push(`WhatsApp: https://wa.me/${digits}`);
+    return lines.join("\n");
   }
 
   async function sendToWeb3Forms(form, data) {
     const payload = new FormData();
     const accessKey = form.elements.namedItem("access_key");
     payload.set("access_key", accessKey ? accessKey.value : "");
-    FIELDS.forEach(field => payload.set(field, data[field]));
+    // Readable labels, empty fields skipped: they become the rows of the email.
+    const LABELS = {
+      name: "Nome", email: "Email", phone: "Telefono", business: "Attività",
+      service_interest: "Servizio", preferred_time: "Quando ricontattarlo"
+    };
+    Object.keys(LABELS).forEach(field => {
+      if (data[field]) payload.set(LABELS[field], data[field]);
+    });
     payload.set("botcheck", data.botcheck ? "true" : "");
     payload.set("message", buildEmailMessage(data));
     payload.set("replyto", data.email);
