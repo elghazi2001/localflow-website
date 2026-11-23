@@ -31,8 +31,8 @@
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=6">
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Outfit:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=7">
 </head>
 
 <body>
@@ -76,15 +76,26 @@
           </div>
         </div>
 
-        <div class="pipeline" aria-label="Esempio di automazione: dalla richiesta del cliente alla conferma automatica">
-          <div class="pipe-head"><span>Prenotazione automatica</span><span class="pipe-run"><i></i>in esecuzione</span></div>
-          <ol class="pipe-steps">
-            <li><b>Arriva una richiesta</b><small>Form, email o WhatsApp</small></li>
-            <li><b>L'agenda si aggiorna</b><small>Niente doppioni, niente sviste</small></li>
-            <li><b>Il cliente riceve la conferma</b><small>Con promemoria prima dell'appuntamento</small></li>
-          </ol>
-          <p class="pipe-foot">Zero passaggi a mano.</p>
+        <div class="term" role="img" aria-label="Esempio di automazione: una prenotazione arriva da WhatsApp, l'agenda si aggiorna, il cliente riceve conferma e promemoria">
+          <div class="term-bar"><span class="term-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="term-title">prenotazioni.run</span><span class="term-live"><i></i>attivo</span></div>
+          <div class="term-body" aria-hidden="true">
+            <p class="t-cmd" style="--d:0s">smartroutine run prenotazioni</p>
+            <p class="t-ok" style="--d:.9s"><b>ok</b> richiesta ricevuta da WhatsApp</p>
+            <p class="t-ok" style="--d:1.6s"><b>ok</b> agenda aggiornata, nessun doppione</p>
+            <p class="t-ok" style="--d:2.3s"><b>ok</b> conferma inviata al cliente</p>
+            <p class="t-ok" style="--d:3s"><b>ok</b> promemoria programmato per domani alle 18:00</p>
+            <p class="t-done" style="--d:3.8s">fatto in 2,4 secondi, zero passaggi a mano<span class="caret"></span></p>
+          </div>
         </div>
+      </div>
+    </section>
+
+    <section class="connects" aria-label="Strumenti che collego">
+      <div class="container">
+        <p>Collego gli strumenti che usi già</p>
+        <ul>
+          <li>WhatsApp</li><li>Gmail</li><li>Google Calendar</li><li>Google Sheets</li><li>Excel e CSV</li><li>PDF</li><li>API e webhook</li><li>Il tuo gestionale</li>
+        </ul>
       </div>
     </section>
 
@@ -102,12 +113,13 @@
       <div class="container">
         <div class="section-head">
           <h2>Come lavoro</h2>
-          <p>Tre passi, un solo interlocutore.</p>
+          <p>Quattro passi, un solo interlocutore.</p>
         </div>
-        <ol class="steps">
-          <li><h3>Mi racconti il problema</h3><p>Una chiamata o un messaggio. Non serve conoscere la soluzione tecnica.</p></li>
-          <li><h3>Ricevi una proposta chiara</h3><p>Cosa farò, in quanto tempo e quanto costa. Il preventivo è gratuito.</p></li>
-          <li><h3>Costruisco, testo e consegno</h3><p>Lo provi con me, ti spiego come si usa e resto disponibile dopo.</p></li>
+        <ol class="flow">
+          <li><span class="node" aria-hidden="true"></span><h3>Mi racconti il problema</h3><p>Una chiamata o un messaggio. Non serve conoscere la soluzione tecnica.</p><code>brief</code></li>
+          <li><span class="node" aria-hidden="true"></span><h3>Ricevi una proposta chiara</h3><p>Cosa farò, in quanto tempo e quanto costa. Il preventivo è gratuito.</p><code>proposta</code></li>
+          <li><span class="node" aria-hidden="true"></span><h3>Costruisco e testo</h3><p>Lo provi con me mentre lo costruisco, così correggiamo subito.</p><code>build + test</code></li>
+          <li><span class="node" aria-hidden="true"></span><h3>Consegno e resto</h3><p>Ti spiego come si usa e resto disponibile per assistenza e modifiche.</p><code>online</code></li>
         </ol>
       </div>
     </section>
