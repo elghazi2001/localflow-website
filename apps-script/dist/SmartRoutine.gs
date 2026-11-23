@@ -48,8 +48,14 @@ function doPost(e) {
     const id = saveRequest_(req, "form");
     console.log("[form] request " + id + " saved");
 
-    // The request is already stored. If the notification fails, the visitor must not
-    // see an error (they would send it twice); the row stays in the Sheet.
+    // The request is already stored. If the draft or the notification fails, the visitor
+    // must not see an error (they would send it twice); the row stays in the Sheet.
+    try {
+      createBaseDraft_(req);
+      console.log("[draft] base reply saved for " + id);
+    } catch (draftErr) {
+      console.error("[draft] failed for " + id + ": " + draftErr);
+    }
     try {
       sendEmail_(id, req, sheetUrl_());
       console.log("[mail] notification sent for " + id);
@@ -170,22 +176,49 @@ function remainingEmails_() {
   }
 }
 
+// ---------- Base reply (no AI) ----------
+const DRAFT_SUBJECT = "La tua richiesta a SmartRoutine Studio";
+
+function firstName_(r) { return String(r.name).split(" ")[0]; }
+
+/** Plain reply used until a tailored one is written by the Claude Code skill /controlla-richieste. */
+function baseReply_(r) {
+  const slot = /^(mattina|pomeriggio|sera)$/i.test(r.preferred_time) ? ", meglio di " + r.preferred_time.toLowerCase() : "";
+  return "Ciao " + firstName_(r) + ",\n\n" +
+    "ho letto la tua richiesta e ti preparo una proposta concreta, che ti mando entro un giorno lavorativo. " +
+    "Nel frattempo, se hai un sito o la scheda Google Maps della tua attività, mandami il link: mi aiuta a capire meglio come lavorate.\n\n" +
+    "Se preferisci parlarne a voce, dimmi quando ti è comodo" + slot + ".\n\n" +
+    "Farouk Elghazi\nSmartRoutine Studio";
+}
+
+function baseWhatsApp_(r) {
+  return "Ciao " + firstName_(r) + ", sono Farouk di SmartRoutine Studio. Ho letto la tua richiesta e ti preparo una proposta concreta. " +
+    "Nel frattempo, hai un sito o la scheda Google Maps da mandarmi? Se preferisci, ne parliamo con una breve chiamata.";
+}
+
+/** Saves the base reply in the Gmail drafts of the owner. Nothing is sent. */
+function createBaseDraft_(r) {
+  GmailApp.createDraft(r.email, DRAFT_SUBJECT, baseReply_(r));
+}
+
 function sendEmail_(id, r, sheetUrl) {
   const left = remainingEmails_();
   const when = Utilities.formatDate(new Date(), "Europe/Rome", "dd/MM/yyyy 'alle' HH:mm");
-  const phoneDigits = r.phone.replace(/[^0-9]/g, "");
-  const replySubject = encodeURIComponent("Re: la tua richiesta a SmartRoutine Studio (" + id + ")");
+  let phoneDigits = r.phone.replace(/[^0-9]/g, "");
+  if (/^3\d{8,9}$/.test(phoneDigits)) phoneDigits = "39" + phoneDigits; // Italian mobile without country code
 
   let body = mailSection_("Cliente", mailTable_([
     ["Nome", esc_(r.name)], ["Email", esc_(r.email)], ["Telefono", esc_(r.phone)],
     ["Servizio", esc_(r.service_interest)], ["Quando ricontattarlo", esc_(r.preferred_time)], ["Sito / Maps", esc_(r.website)]
   ]));
   body += mailSection_("Cosa ha scritto", mailQuote_(r.problem_description));
-  let buttons = mailButton_("mailto:" + r.email + "?subject=" + replySubject, "Rispondi", "primary");
-  if (phoneDigits.length >= 8) buttons += mailButton_("https://wa.me/" + phoneDigits, "WhatsApp", "secondary");
+  const mailto = "mailto:" + r.email + "?subject=" + encodeURIComponent(DRAFT_SUBJECT) + "&body=" + encodeURIComponent(baseReply_(r));
+  let buttons = mailButton_(mailto, "Rispondi con la bozza", "primary");
+  if (phoneDigits.length >= 8) buttons += mailButton_("https://wa.me/" + phoneDigits + "?text=" + encodeURIComponent(baseWhatsApp_(r)), "WhatsApp con messaggio pronto", "secondary");
+  buttons += mailButton_("https://mail.google.com/mail/?authuser=" + encodeURIComponent(NOTIFY_EMAIL) + "#drafts", "Apri le bozze", "secondary");
   buttons += mailButton_(sheetUrl, "Registro richieste", "secondary");
   body += '<div style="margin:6px 0 10px;">' + buttons + '</div>' +
-    '<p style="margin:0 0 16px;font-size:13px;color:' + MAIL.muted + ';">Per preparare la risposta lancia /controlla-richieste in Claude Code: troverai la bozza in Gmail.</p>';
+    '<p style="margin:0 0 16px;font-size:13px;color:' + MAIL.muted + ';">La bozza base è già nelle bozze di Gmail. Per una risposta su misura con pagina proposta lancia /controlla-richieste in Claude Code.</p>';
 
   const text = ["Nuova richiesta " + id + " — " + when, "Nome: " + r.name, "Email: " + r.email, "Telefono: " + (r.phone || "-"),
     "Servizio: " + (r.service_interest || "-"), "Sito/Maps: " + (r.website || "-"), "", r.problem_description, "", "Registro: " + sheetUrl
