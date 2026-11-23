@@ -14,6 +14,15 @@ document.addEventListener("DOMContentLoaded", function () {
     configEmailDisplay.href = `mailto:${config.contactEmail}`;
   }
 
+  const legalId = document.getElementById("legalId");
+  if (legalId && config.vatNumber) legalId.textContent = " · " + config.vatNumber;
+
+  // Prefill the interest select from the package buttons
+  document.querySelectorAll("[data-pack]").forEach(a => a.addEventListener("click", () => {
+    const sel = document.getElementById("formServiceInterest");
+    if (sel) sel.value = a.dataset.pack;
+  }));
+
   const footerEmailLink = document.getElementById("footerEmailLink");
   if (footerEmailLink && config.contactEmail) {
     footerEmailLink.textContent = config.contactEmail;

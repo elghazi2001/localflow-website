@@ -5,6 +5,8 @@
 window.SR_CONFIG = {
   brandName: "SmartRoutine Studio",
   tagline: "Strumenti digitali su misura, automazioni di processi e integrazioni IA pratiche per attività locali.",
+  /** Dati legali mostrati nel footer. Compila appena disponibile (es. "P.IVA 01234567890"). */
+  vatNumber: "",
   contactEmail: "elghazifarouk112@gmail.com",
   whatsappNumber: "+393281016993",
   whatsappDefaultMessage: "Ciao SmartRoutine Studio! Vorrei discutere un problema nella mia attività e valutare una soluzione praticabile.",

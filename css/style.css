@@ -327,3 +327,22 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .phone-go { width: 100%; margin-top: 20px; padding: 14px; border: 0; border-radius: 999px; background: var(--pink); color: #fff; font: 700 16px var(--font-body); cursor: pointer; }
 .phone-ok { margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: #E9F8EF; color: #1B6B3E; font-size: 14.5px; font-weight: 500; }
 @media (max-width: 992px) { .demo-grid { grid-template-columns: 1fr; gap: 40px; } }
+
+/* Pricing packages */
+.packs { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.pack { display: flex; flex-direction: column; gap: 14px; padding: 28px 24px; border: 1px solid var(--line); border-radius: 14px; background: var(--night-2); }
+.pack-main { border-color: var(--pink); box-shadow: 0 0 0 1px var(--pink), 0 12px 40px rgba(255, 61, 139, .15); }
+.pack h3 { font-size: 30px; }
+.pack-price { color: var(--text); font-size: 17px; }
+.pack-price strong { font: 800 34px var(--font-display); color: var(--orange); }
+.pack-price span { color: var(--muted); font-size: 14px; }
+.pack .tech { margin-top: 0; }
+.pack .button { margin-top: auto; align-self: flex-start; }
+.pack-note { margin-top: 28px; font-size: 16px; }
+.legal { max-width: 780px; padding: 110px 0 70px; }
+.legal h1 { font-size: clamp(40px, 6vw, 64px); margin-bottom: 24px; }
+.legal h2 { font-size: 30px; margin: 32px 0 10px; }
+.legal p, .legal li { margin-bottom: 10px; font-size: 17px; }
+.legal ul { padding-left: 22px; color: var(--muted); }
+.legal a { color: var(--teal); }
+@media (max-width: 992px) { .packs { grid-template-columns: 1fr; } }
