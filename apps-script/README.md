@@ -4,7 +4,7 @@ This Google Apps Script receives contact-form submissions, logs each one in the 
 **"Richieste SmartRoutine Studio"** (created automatically in your Drive) and emails you a formatted HTML notification.
 
 1. Open <https://script.google.com> (signed in as the Gmail account that should receive requests) → **New project**.
-2. Delete the sample code. Create one script file per `.gs` in this folder (`Code`, `Mail`, `Research`, `Ai`, `Queue`, `Stats`) and paste each one in. Rename the project "SmartRoutine Requests", save (Ctrl+S).
+2. Delete the sample code and paste the whole content of **`dist/SmartRoutine.gs`** (one file, everything included; rebuilt with `./build.sh` from the module files). Rename the project "SmartRoutine Requests", save (Ctrl+S).
 3. In the function dropdown pick **`setup`** → **Run** → **Review permissions** → choose your account → *Advanced* → *Go to SmartRoutine Requests* → **Allow**.
    (Permissions requested: create/edit the Doc, send email as you, temporary cache.) The log shows the Doc link.
 4. **Deploy → New deployment** → type **Web app** → *Execute as*: **Me** → *Who has access*: **Anyone** → **Deploy**.
