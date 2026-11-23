@@ -17,7 +17,7 @@ const MOCKUP_BASE_URL = "https://elghazi2001.github.io/localflow-website/mockup.
 const SITE_URL = "https://elghazi2001.github.io/localflow-website/";
 
 const LIMITS = {
-  name: 100, business: 120, email: 254, phone: 30,
+  name: 100, business: 120, email: 254, phone: 30, website: 300,
   service_interest: 80, preferred_time: 40,
   problem_description: 3000
 };
@@ -42,15 +42,9 @@ function doPost(e) {
     const limited = rateLimit_(req.email);
     if (limited) return json_({ success: false, message: limited });
 
-    const lock = LockService.getScriptLock();
-    lock.waitLock(15000);
-    let id, docUrl;
-    try {
-      id = nextId_();
-      docUrl = appendToDoc_(id, req);
-    } finally {
-      lock.releaseLock();
-    }
+    // saveRequest_ takes the script lock itself (short, non-reentrant).
+    const id = saveRequest_(req, "form", "");
+    const docUrl = appendToDoc_(id, req);
     sendEmail_(id, req, docUrl);
 
     return json_({ success: true, id: id });
@@ -60,7 +54,10 @@ function doPost(e) {
   }
 }
 
-function doGet() {
+function doGet(e) {
+  const p = (e && e.parameter) || {};
+  if (p.action === "review") return reviewPage_(p);
+  if (p.action === "demo") return demoPage_(p);
   return json_({ ok: true, service: "SmartRoutine request receiver" });
 }
 
@@ -174,6 +171,7 @@ function appendToDoc_(id, r) {
   const rows = [
     ["Email", r.email],
     ["Telefono", dash(r.phone)],
+    ["Sito / Maps", dash(r.website)],
     ["Attività", dash(r.business)],
     ["Servizio", dash(r.service_interest)],
     ["Quando contattarlo", dash(r.preferred_time)],
@@ -215,75 +213,32 @@ function remainingEmails_() {
 
 function sendEmail_(id, r, docUrl) {
   const left = remainingEmails_();
-  const quotaText = left === null ? "" : "Email rimaste oggi: " + left;
   const when = Utilities.formatDate(new Date(), "Europe/Rome", "dd/MM/yyyy 'alle' HH:mm");
   const phoneDigits = r.phone.replace(/[^0-9]/g, "");
   const replySubject = encodeURIComponent("Re: la tua richiesta a SmartRoutine Studio (" + id + ")");
-  const mockupUrl = MOCKUP_BASE_URL + "?id=" + encodeURIComponent(id) +
-    "&service=" + encodeURIComponent(r.service_interest || "");
 
-  const row = function (label, value) {
-    return '<tr><td style="padding:10px 14px;background:#F6F4FF;color:#4B3BA8;font-weight:600;width:170px;' +
-      'border-bottom:1px solid #ECE8FF;font-size:14px;">' + esc_(label) + '</td>' +
-      '<td style="padding:10px 14px;border-bottom:1px solid #ECE8FF;font-size:14px;color:#1F1D2B;">' +
-      (value ? esc_(value) : '<span style="color:#9A98A8;">Non specificato</span>') + '</td></tr>';
-  };
-  const button = function (href, text, bg, color) {
-    return '<a href="' + esc_(href) + '" style="display:inline-block;margin:6px 6px 0 0;padding:11px 18px;' +
-      'border-radius:8px;background:' + bg + ';color:' + color + ';font-weight:600;font-size:14px;' +
-      'text-decoration:none;">' + esc_(text) + '</a>';
-  };
+  let body = mailSection_("Cliente", mailTable_([
+    ["Nome", esc_(r.name)], ["Email", esc_(r.email)], ["Telefono", esc_(r.phone)],
+    ["Servizio", esc_(r.service_interest)], ["Quando ricontattarlo", esc_(r.preferred_time)], ["Sito / Maps", esc_(r.website)]
+  ]));
+  body += mailSection_("Cosa ha scritto", mailQuote_(r.problem_description));
+  let buttons = mailButton_("mailto:" + r.email + "?subject=" + replySubject, "Rispondi", "primary");
+  if (phoneDigits.length >= 8) buttons += mailButton_("https://wa.me/" + phoneDigits, "WhatsApp", "secondary");
+  buttons += mailButton_(docUrl, "Registro richieste", "secondary");
+  body += '<div style="margin:6px 0 10px;">' + buttons + '</div>' +
+    '<p style="margin:0 0 16px;font-size:13px;color:' + MAIL.muted + ';">Entro 15 minuti ricevi una seconda email con la bozza di risposta da approvare.</p>';
 
-  let buttons = button("mailto:" + r.email + "?subject=" + replySubject, "✉ Rispondi al cliente", "#6D4AFF", "#FFFFFF");
-  if (phoneDigits.length >= 8) buttons += button("https://wa.me/" + phoneDigits, "WhatsApp", "#25D366", "#FFFFFF");
-  buttons += button(docUrl, "📄 Apri registro richieste", "#FFFFFF", "#6D4AFF");
-
-  const html =
-    '<div style="background:#F4F3F8;padding:24px 0;font-family:Inter,Segoe UI,Arial,sans-serif;">' +
-    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;margin:0 auto;' +
-    'background:#FFFFFF;border-radius:14px;overflow:hidden;border:1px solid #E6E3F2;">' +
-    '<tr><td style="background:#6D4AFF;padding:22px 26px;color:#FFFFFF;">' +
-    '<div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;opacity:.85;">Nuova richiesta · ' + esc_(id) + '</div>' +
-    '<div style="font-size:22px;font-weight:700;margin-top:4px;">' + esc_(r.name) +
-    (r.business ? ' <span style="font-weight:400;opacity:.9;">— ' + esc_(r.business) + '</span>' : '') + '</div>' +
-    '<div style="font-size:13px;opacity:.85;margin-top:6px;">Ricevuta il ' + esc_(when) + '</div></td></tr>' +
-    '<tr><td style="padding:20px 26px 4px;">' +
-    '<span style="display:inline-block;background:#EFEAFF;color:#4B3BA8;border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600;margin:0 6px 6px 0;">' +
-    esc_(r.service_interest || "Servizio non indicato") + '</span>' +
-    '<span style="display:inline-block;background:#FFF4E5;color:#9A5B00;border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600;margin:0 6px 6px 0;">Contattalo: ' +
-    esc_(r.preferred_time || "quando vuoi") + '</span></td></tr>' +
-    '<tr><td style="padding:12px 26px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" ' +
-    'style="border:1px solid #ECE8FF;border-radius:10px;overflow:hidden;">' +
-    row("Email", r.email) + row("Telefono", r.phone) + row("Attività", r.business) + '</table></td></tr>' +
-    '<tr><td style="padding:8px 26px;"><div style="font-size:13px;font-weight:700;color:#4B3BA8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Descrizione del problema</div>' +
-    '<div style="background:#FAFAFD;border-left:4px solid #6D4AFF;border-radius:6px;padding:14px 16px;font-size:14px;line-height:1.6;color:#1F1D2B;white-space:pre-wrap;">' +
-    esc_(r.problem_description) + '</div></td></tr>' +
-    '<tr><td style="padding:14px 26px 6px;">' + buttons + '</td></tr>' +
-    '<tr><td style="padding:14px 26px 24px;"><div style="border:1px dashed #C9BDFF;border-radius:10px;padding:16px;background:#FBFAFF;">' +
-    '<div style="font-size:14px;font-weight:700;color:#1F1D2B;">Prossimo passo</div>' +
-    '<div style="font-size:13px;color:#5B5970;margin:4px 0 10px;">Prepara un mockup del servizio richiesto da mostrare al cliente.</div>' +
-    button(mockupUrl, "✨ Genera mockup del servizio", "#1F1D2B", "#FFFFFF") + '</div></td></tr>' +
-    '<tr><td style="padding:14px 26px;background:#FAF9FD;color:#8B899C;font-size:12px;border-top:1px solid #EEECF5;">' +
-    'Inviata dal modulo di <a href="' + esc_(SITE_URL) + '" style="color:#6D4AFF;">SmartRoutine Studio</a>. ' +
-    'Rispondendo a questa email scrivi direttamente al cliente.' +
-    (quotaText ? '<br><strong>' + esc_(quotaText) + '</strong> (limite giornaliero di Google)' : '') +
-    '</td></tr>' +
-    '</table></div>';
-
-  const text = [
-    "Nuova richiesta " + id + " — " + when,
-    "Nome: " + r.name, "Email: " + r.email, "Telefono: " + (r.phone || "-"),
-    "Attività: " + (r.business || "-"),
-    "Servizio: " + (r.service_interest || "-"),
-    "Quando contattarlo: " + (r.preferred_time || "-"), "", r.problem_description, "",
-    "Registro: " + docUrl
-  ].concat(quotaText ? ["", quotaText] : []).join("\n");
+  const text = ["Nuova richiesta " + id + " — " + when, "Nome: " + r.name, "Email: " + r.email, "Telefono: " + (r.phone || "-"),
+    "Servizio: " + (r.service_interest || "-"), "Sito/Maps: " + (r.website || "-"), "", r.problem_description, "", "Registro: " + docUrl
+  ].concat(left === null ? [] : ["", "Email rimaste oggi: " + left]).join("\n");
 
   MailApp.sendEmail({
     to: NOTIFY_EMAIL,
     subject: "Nuova richiesta " + id + ": " + r.name + " · " + (r.service_interest || "Richiesta generica"),
     body: text,
-    htmlBody: html,
+    htmlBody: mailShell_({ preheader: r.name + ": " + r.problem_description.slice(0, 90), title: "Nuova richiesta " + id,
+      subtitle: r.name + " · " + when, body: body,
+      footer: left === null ? "SmartRoutine Studio" : "<strong>Email rimaste oggi: " + esc_(left) + "</strong> (limite giornaliero di Google)" }),
     replyTo: r.email,
     name: "SmartRoutine Studio · Sito"
   });

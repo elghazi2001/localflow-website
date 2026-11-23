@@ -12,8 +12,9 @@
   const COOLDOWN_MS = Number(formConfig.submitCooldownMs) || 30000;
   const MIN_FILL_MS = 3000;
   const REQUEST_TIMEOUT_MS = 20000;
+  const MIN_DESCRIPTION = 200;
   const FIELDS = [
-    "name", "business", "email", "phone", "service_interest", "preferred_time", "problem_description"
+    "name", "business", "email", "phone", "website", "service_interest", "preferred_time", "problem_description"
   ];
 
   let formShownAt = Date.now();
@@ -73,12 +74,12 @@
       showFieldError(form, "email", "err-email", "Inserisci un indirizzo email valido.");
       valid = false;
     }
-    if (!description) {
+    if (description.length < MIN_DESCRIPTION) {
       showFieldError(
         form,
         "problem_description",
         "err-problem",
-        "Descrivi brevemente il tuo problema o la tua esigenza."
+        `Servono almeno ${MIN_DESCRIPTION} caratteri (ora ${description.length}). Più dettagli ci dai, più precisa sarà la proposta.`
       );
       valid = false;
     }
@@ -178,7 +179,7 @@
     payload.set("access_key", accessKey ? accessKey.value : "");
     // Readable labels, empty fields skipped: they become the rows of the email.
     const LABELS = {
-      name: "Nome", email: "Email", phone: "Telefono", business: "Attività",
+      name: "Nome", email: "Email", phone: "Telefono", business: "Attività", website: "Sito o Maps",
       service_interest: "Servizio", preferred_time: "Quando ricontattarlo"
     };
     Object.keys(LABELS).forEach(field => {
@@ -316,11 +317,37 @@
     }
   }
 
+  // Live counter + progress bar that nudges people to write enough detail.
+  function setupDescriptionMeter(form) {
+    const area = form.elements.namedItem("problem_description");
+    const bar = document.getElementById("descBar");
+    const count = document.getElementById("descCount");
+    const tip = document.getElementById("descTip");
+    if (!area || !bar || !count || !tip) return;
+
+    const update = () => {
+      const n = area.value.trim().length;
+      const pct = Math.min(100, Math.round((n / MIN_DESCRIPTION) * 100));
+      bar.style.width = pct + "%";
+      bar.parentElement.setAttribute("aria-valuenow", String(pct));
+      count.textContent = n >= MIN_DESCRIPTION ? `${n} caratteri` : `${n} / ${MIN_DESCRIPTION}`;
+      bar.parentElement.classList.toggle("is-ok", n >= MIN_DESCRIPTION);
+      tip.textContent = n === 0
+        ? "Più dettagli scrivi, più precisa sarà la nostra proposta e prima potremo iniziare."
+        : n < MIN_DESCRIPTION
+          ? `Ancora ${MIN_DESCRIPTION - n} caratteri e riceverai una proposta su misura.`
+          : "Ottimo, con queste informazioni possiamo prepararti una proposta concreta.";
+    };
+    area.addEventListener("input", update);
+    update();
+  }
+
   function initializeContactForm() {
     const elements = getFormElements();
     if (!elements || !elements.submitButton) return;
 
     formShownAt = Date.now();
+    setupDescriptionMeter(elements.form);
     elements.form.addEventListener("submit", event => {
       handleSubmit(event, elements);
     });

@@ -14,6 +14,9 @@ window.SR_CONFIG = {
    * requestEndpoint: optional Google Apps Script Web App URL.
    * When empty, the form uses Web3Forms directly.
    */
+  /** GoatCounter site code (free visit stats). Leave empty to disable. */
+  goatcounterCode: "",
+
   requestEndpoint: "",
   submitCooldownMs: 30000
 };

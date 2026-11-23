@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://api.web3forms.com; form-action https://api.web3forms.com; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
+    content="default-src 'self'; script-src 'self' https://gc.zgo.at; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.goatcounter.com https://script.google.com https://script.googleusercontent.com https://api.web3forms.com; form-action https://api.web3forms.com; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>SmartRoutine Studio — Automazioni, pipeline e strumenti su misura</title>
   <meta name="description" content="Costruisco automazioni, pipeline di dati, sistemi di prenotazione e integrazioni IA per attività locali e aziende digitali.">
@@ -193,8 +193,24 @@
               </select>
             </div>
             <div class="form-group">
+              <label for="formWebsite">Sito web o link Google Maps <small>(facoltativo, ci aiuta a capire la tua attività)</small></label>
+              <input type="text" id="formWebsite" name="website" placeholder="https://..." maxlength="300" autocomplete="url" inputmode="url">
+            </div>
+            <div class="form-group">
               <label for="formProblem">Cosa vorresti migliorare? <span class="required">*</span></label>
-              <textarea id="formProblem" name="problem_description" rows="5" maxlength="3000" placeholder="Cosa richiede troppo tempo o cosa vorresti automatizzare?" required></textarea>
+              <textarea id="formProblem" name="problem_description" rows="7" maxlength="3000" aria-describedby="descTip err-problem"
+                placeholder="Esempio: ho un salone con 3 collaboratrici. Le prenotazioni arrivano su WhatsApp, Instagram e telefono, e ogni settimana perdiamo almeno due appuntamenti per sovrapposizioni. Vorrei un posto unico dove i clienti prenotano e ricevono un promemoria. Oggi uso un'agenda di carta e Google Calendar."
+                required></textarea>
+              <div class="desc-meter" role="progressbar" aria-label="Completezza della descrizione" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div class="desc-track"><div class="desc-bar" id="descBar"></div></div>
+                <span class="desc-count" id="descCount">0 / 200</span>
+              </div>
+              <p class="desc-tip" id="descTip">Più dettagli scrivi, più precisa sarà la nostra proposta e prima potremo iniziare.</p>
+              <ul class="desc-prompts">
+                <li>Cosa ti fa perdere più tempo oggi?</li>
+                <li>Quali strumenti usi (WhatsApp, Excel, agenda, gestionale)?</li>
+                <li>Come sarebbe per te un buon risultato?</li>
+              </ul>
               <span class="field-error" id="err-problem"></span>
             </div>
             <div class="form-group consent-group">
@@ -203,7 +219,7 @@
                 <span>Acconsento al trattamento dei dati inviati per ricevere una risposta.</span>
               </label>
               <span class="field-error" id="err-consent"></span>
-              <p class="form-privacy">I dati sono usati solo per rispondere alla tua richiesta, conservati nella casella email e in un registro privato su Google Drive del titolare, e non sono ceduti a terzi. Per modifica o cancellazione scrivi a <a href="mailto:elghazifarouk112@gmail.com">elghazifarouk112@gmail.com</a>.</p>
+              <p class="form-privacy">I dati sono usati solo per rispondere alla tua richiesta. Per preparare una proposta il testo che scrivi e le informazioni pubbliche del tuo sito possono essere elaborati con uno strumento di intelligenza artificiale (Google Gemini); ogni messaggio viene riletto e approvato da una persona prima di essere inviato. I dati restano nella casella email e in un registro privato del titolare e non sono ceduti a terzi. Per modifica o cancellazione scrivi a <a href="mailto:elghazifarouk112@gmail.com">elghazifarouk112@gmail.com</a>.</p>
             </div>
             <button type="submit" class="button button-primary button-full" id="submitBtn">
               <span class="btn-text">Prenota la tua call gratuita</span>

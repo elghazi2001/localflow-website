@@ -20,6 +20,15 @@ document.addEventListener("DOMContentLoaded", function () {
     footerEmailLink.href = `mailto:${config.contactEmail}`;
   }
 
+  // Optional privacy-friendly visit counter (GoatCounter, no cookies)
+  if (config.goatcounterCode && /^[a-z0-9-]+$/i.test(config.goatcounterCode)) {
+    const gc = document.createElement("script");
+    gc.async = true;
+    gc.src = "https://gc.zgo.at/count.js";
+    gc.dataset.goatcounter = `https://${config.goatcounterCode}.goatcounter.com/count`;
+    document.head.appendChild(gc);
+  }
+
   // 2. WhatsApp Channels Generation
   const waNum = (config.whatsappNumber || "393000000000").replace(/[^0-9]/g, '');
   const waMsg = encodeURIComponent(config.whatsappDefaultMessage || "Ciao SmartRoutine Studio!");

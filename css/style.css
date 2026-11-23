@@ -239,3 +239,14 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .pipe-steps::after { top: 14px; }
   * { transition: none !important; }
 }
+
+/* Description meter */
+.desc-meter { display: flex; align-items: center; gap: 12px; }
+.desc-track { flex: 1; height: 8px; border-radius: 99px; background: var(--night-2); overflow: hidden; }
+.desc-bar { height: 100%; width: 0; background: var(--sunset); border-radius: 99px; transition: width .25s var(--ease); }
+.desc-meter.is-ok .desc-bar { background: var(--teal); }
+.desc-count { font-size: 14px; font-weight: 600; color: var(--muted); min-width: 84px; text-align: right; }
+.desc-meter.is-ok .desc-count { color: var(--teal); }
+.desc-tip { font-size: 15px; color: var(--text); }
+.desc-prompts { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 14px; color: var(--muted); }
+.desc-prompts li::before { content: "•"; color: var(--orange); margin-right: 6px; }
