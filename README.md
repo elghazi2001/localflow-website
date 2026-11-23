@@ -8,7 +8,7 @@ Website of **SmartRoutine Studio**, an independent software developer in Pavia w
 SmartRoutine-Studio/
 ├── index.html              # Main semantic HTML5 file (Italian)
 ├── mockup.html             # Placeholder for the future mockup generator
-├── apps-script/            # Google Apps Script: Sheet log, HTML email, AI drafts with approval
+├── apps-script/            # Google Apps Script: Sheet log + HTML notification email
 ├── README.md               # Documentation & setup guide
 ├── sitemap.xml, robots.txt # SEO files
 ├── assets/
@@ -46,8 +46,8 @@ window.SR_CONFIG = {
 1. **Primary — Google Apps Script** (`apps-script/Code.gs`, deploy guide in `apps-script/README.md`):
    saves every request as a row in the Google Sheet *"Richieste SmartRoutine Studio"* (with ID and status)
    and sends you an HTML email with the details and reply/WhatsApp/Sheet buttons. If the email fails, the
-   request is still saved and the visitor still sees a success message. Every 15 minutes the queue prepares an
-   AI draft that is sent to you only; nothing reaches the client before you confirm.
+   request is still saved and the visitor still sees a success message. Replies are prepared on demand by the
+   Claude Code skill `/controlla-richieste`, which writes Gmail drafts only; nothing reaches the client before you press Send.
 2. **Fallback — Web3Forms**: if the Apps Script is not configured or unreachable, the form sends the
    plain-text email through Web3Forms so no request is lost. Reply-To is set to the customer's email.
 

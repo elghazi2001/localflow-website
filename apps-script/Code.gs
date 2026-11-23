@@ -42,11 +42,11 @@ function doPost(e) {
     if (limited) return json_({ success: false, message: limited });
 
     // saveRequest_ takes the script lock itself (short, non-reentrant).
-    const id = saveRequest_(req, "form", "");
+    const id = saveRequest_(req, "form");
     console.log("[form] request " + id + " saved");
 
     // The request is already stored. If the notification fails, the visitor must not
-    // see an error (they would send it twice); the 15-minute queue still picks it up.
+    // see an error (they would send it twice); the row stays in the Sheet.
     try {
       sendEmail_(id, req, sheetUrl_());
       console.log("[mail] notification sent for " + id);
@@ -61,10 +61,7 @@ function doPost(e) {
   }
 }
 
-function doGet(e) {
-  const p = (e && e.parameter) || {};
-  if (p.action === "review") return reviewPage_(p);
-  if (p.action === "demo") return demoPage_(p);
+function doGet() {
   return json_({ ok: true, service: "SmartRoutine request receiver" });
 }
 
@@ -185,7 +182,7 @@ function sendEmail_(id, r, sheetUrl) {
   if (phoneDigits.length >= 8) buttons += mailButton_("https://wa.me/" + phoneDigits, "WhatsApp", "secondary");
   buttons += mailButton_(sheetUrl, "Registro richieste", "secondary");
   body += '<div style="margin:6px 0 10px;">' + buttons + '</div>' +
-    '<p style="margin:0 0 16px;font-size:13px;color:' + MAIL.muted + ';">Entro 15 minuti ricevi una seconda email con la bozza di risposta da approvare.</p>';
+    '<p style="margin:0 0 16px;font-size:13px;color:' + MAIL.muted + ';">Per preparare la risposta lancia /controlla-richieste in Claude Code: troverai la bozza in Gmail.</p>';
 
   const text = ["Nuova richiesta " + id + " — " + when, "Nome: " + r.name, "Email: " + r.email, "Telefono: " + (r.phone || "-"),
     "Servizio: " + (r.service_interest || "-"), "Sito/Maps: " + (r.website || "-"), "", r.problem_description, "", "Registro: " + sheetUrl

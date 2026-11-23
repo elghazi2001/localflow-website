@@ -1,12 +1,13 @@
-# Request receiver — deploy guide (≈5 minutes)
+# Request receiver: deploy guide (about 5 minutes)
 
 This Google Apps Script receives contact-form submissions, saves each one as a row in the Google Sheet
 **"Richieste SmartRoutine Studio"** (created automatically in your Drive) and emails you a formatted HTML notification.
+It does not write replies: that is done by the Claude Code skill `/controlla-richieste` (see below).
 
 1. Open <https://script.google.com> (signed in as the Gmail account that should receive requests) → **New project**.
-2. Delete the sample code and paste the whole content of **`dist/SmartRoutine.gs`** (one file, everything included; rebuilt with `./build.sh` from the module files). Rename the project "SmartRoutine Requests", save (Ctrl+S).
-3. In the function dropdown pick **`installTrigger`** → **Run** → **Review permissions** → choose your account → *Advanced* → *Go to SmartRoutine Requests* → **Allow**.
-   (Permissions requested: Sheets, Gmail, send email as you, external requests.) The log shows the Sheet link.
+2. Delete the sample code and paste the whole content of **`dist/SmartRoutine.gs`** (one file, everything included; rebuilt with `sh build.sh` from `Code.gs`, `Mail.gs`, `Sheet.gs`). Rename the project "SmartRoutine Requests", save (Ctrl+S).
+3. In the function dropdown pick **`setup`** → **Run** → **Review permissions** → choose your account → *Advanced* → *Go to SmartRoutine Requests* → **Allow**.
+   (Permissions requested: Sheets, send email as you, temporary cache.) The log shows the Sheet link. `setup` also removes any old triggers.
    To check the form path without the website, run **`testForm`**: it saves a fake request and prints the result.
 4. **Deploy → New deployment** → type **Web app** → *Execute as*: **Me** → *Who has access*: **Anyone** → **Deploy**.
 5. Copy the **Web app URL** (`https://script.google.com/macros/s/…/exec`) into `requestEndpoint` in `js/config.js`.
@@ -20,21 +21,17 @@ Updating the code later: **Deploy → Manage deployments → ✏ → Version: Ne
 - The global counter uses Script Properties and a script lock so concurrent submissions cannot all pass using the same stale count. Cache-based per-email cooldowns can still expire early and are not a durable identity control.
 - The web app is publicly callable (required for a public static form). Do not treat a shared value embedded in JavaScript as authentication.
 - Configure a server-verified CAPTCHA/Turnstile check and a rate-limiting proxy/WAF before relying on this endpoint for production traffic.
-- The script only runs as you and can only touch the Sheet it created, your Gmail, and send mail to you (and to a client only after you confirm).
+- The script only runs as you, touches only the Sheet it created and sends mail to `NOTIFY_EMAIL`. It never contacts the client.
 
-## AI drafts with your approval (free)
+## Replies with Claude Code (no API key, included in the Pro plan)
 
-Every 15 minutes the script reads new requests (from the form, and from the Web3Forms emails in your Gmail), checks that the
-description is detailed enough (200+ characters, real content), looks up the client's public website or Maps link, asks Google Gemini
-for a plan that uses only free tools, and emails **you** a draft (email + WhatsApp + a small demo page). Nothing reaches a client until you
-open the review page and confirm. Email and WhatsApp are approved separately, and each link works only after you press the button on the page.
+The Sheet columns are: id, creato, nome, email, telefono, attivita, sito, servizio, orario, descrizione, stato, …, plus
+`riassunto`, `whatsapp`, `domande` filled by Claude.
 
-One-time setup:
-1. Get a free key at <https://aistudio.google.com/apikey>. In the Apps Script editor: **Project Settings → Script properties** → add `GEMINI_API_KEY`.
-2. Run **`installTrigger`** once (creates the Sheet "Richieste SmartRoutine Studio", a signing secret and the 15-minute trigger). Authorize Gmail, Sheets and external requests when asked.
-3. **Deploy → Manage deployments → New version** so the review and demo pages are served. Optionally add property `WEBAPP_URL` with the `/exec` URL.
-4. Test with **`testPipeline`** then **`processQueue`**: you should get one "Servono dettagli" email (short text, no AI) and one "Bozza pronta" email.
-5. Optional visit stats: create a free account at <https://www.goatcounter.com>, put its code in `goatcounterCode` in `js/config.js`, then add Script properties `GOATCOUNTER_CODE` and `GOATCOUNTER_TOKEN` (read-only API token).
+When you type **`/controlla-richieste`** in Claude Code, it reads the rows with state `Nuova`, looks at the client's website or
+Google Maps page, writes the email, a WhatsApp message, a short summary and the missing questions in natural Italian (using the
+humanizer skill), creates a **Gmail draft** addressed to the client and sets the state to `Bozza Claude`.
+Nothing is sent: you review the draft and press Send yourself.
 
-Notes: the daily AI call cap is 40 (`AI_DAILY_CAP`). The free Gemini tier may use inputs to improve Google products; the form's privacy text says so.
-Client text is treated as untrusted in the prompt, the AI only fills text fields in a fixed demo template, and drafts are never sent automatically.
+The skill lives in `~/.claude/skills/controlla-richieste/SKILL.md` on your PC (not in this repository). It needs the Gmail and
+Google Sheets connectors enabled in Claude.
