@@ -10,19 +10,21 @@ SmartRoutine-Studio/
 ├── mockup.html             # Placeholder for the future mockup generator
 ├── apps-script/            # Google Apps Script: Doc log + HTML email
 ├── README.md               # Documentation & setup guide
+├── sitemap.xml, robots.txt # SEO files
 ├── assets/
-│   ├── logo.svg            # Custom SVG logo with purple workflow node icon
-│   ├── favicon.svg         # Derived favicon SVG
-│   ├── images/             # Visual graphic assets
-│   └── icons/              # Local UI vector icon assets
+│   ├── logo.svg            # Logo
+│   ├── favicon.svg         # Favicon
+│   ├── og-image.png        # Social preview image
+│   └── farouk-elghazi.jpg  # Portrait used in the "Chi sono" section
 ├── css/
-│   ├── style.css           # Primary design system, typography, components, desktop layout
-│   └── responsive.css      # Responsive media queries for tablet & mobile viewports
+│   └── style.css           # Design system, components, layout and responsive rules
 └── js/
-    ├── config.js           # Central editable configuration object (prices, contact details)
-    ├── services.js         # Service cards and pricing packages renderer
-    ├── form.js             # Contact form validation & email submission integration
-    └── main.js             # UI interactions, mobile navigation, scroll behavior
+    ├── config.js           # Central editable configuration object
+    ├── services.js         # Service list renderer
+    ├── form.js             # Contact form validation & submission
+    ├── demo.js             # Interactive booking demo
+    ├── mockup.js           # Placeholder page script
+    └── main.js             # UI interactions, mobile menu, GoatCounter loader, WhatsApp links
 ```
 
 ## ⚙️ Central Configuration (`js/config.js`)
@@ -33,9 +35,8 @@ You can edit business variables without modifying HTML or core code:
 window.SR_CONFIG = {
   contactEmail: "elghazifarouk112@gmail.com",
   whatsappNumber: "+393281016993",
-  pricing: { website: 372, bookingSystem: 450, automation: 150, aiIntegration: 400, custom: "Su Preventivo" },
+  goatcounterCode: "smartroutine",                       // GoatCounter site code (free, cookieless stats)
   requestEndpoint: "https://script.google.com/macros/s/…/exec", // Apps Script Web App URL
-  requestToken: "srs-2026-form",                               // must match FORM_TOKEN in Code.gs
   submitCooldownMs: 30000
 };
 ```

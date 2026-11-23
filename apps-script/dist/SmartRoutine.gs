@@ -294,6 +294,7 @@ function mailTable_(rows) {
     return '<tr><td style="padding:9px 12px;width:150px;background:' + MAIL.soft + ';color:' + MAIL.muted + ';font-size:13px;border-bottom:1px solid ' + MAIL.line + ';vertical-align:top;">' + esc_(r[0]) + '</td>' +
       '<td style="padding:9px 12px;font-size:14px;border-bottom:1px solid ' + MAIL.line + ';">' + r[1] + '</td></tr>';
   }).join("");
+  if (!body) return "";
   return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ' + MAIL.line + ';border-radius:10px;border-collapse:separate;overflow:hidden;">' + body + '</table>';
 }
 
@@ -483,16 +484,26 @@ function geminiJson_(system, user) {
   if (aiBudgetLeft_() <= 0) throw new Error("Limite giornaliero di chiamate AI raggiunto.");
   props.setProperty("AI_COUNT", String(Number(props.getProperty("AI_COUNT") || 0) + 1));
 
-  const model = props.getProperty("GEMINI_MODEL") || "gemini-2.5-flash";
-  const res = UrlFetchApp.fetch("https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent", {
-    method: "post", contentType: "application/json", muteHttpExceptions: true,
-    headers: { "x-goog-api-key": key },
-    payload: JSON.stringify({
-      systemInstruction: { parts: [{ text: system }] },
-      contents: [{ role: "user", parts: [{ text: user }] }],
-      generationConfig: { responseMimeType: "application/json", temperature: 0.6, maxOutputTokens: 4096 }
-    })
+  // Main model twice (a 503 is usually a short spike), then a backup model once.
+  const main = props.getProperty("GEMINI_MODEL") || "gemini-3.8-flash";
+  const models = [main, main, "gemini-3.6-flash"];
+  const payload = JSON.stringify({
+    systemInstruction: { parts: [{ text: system }] },
+    contents: [{ role: "user", parts: [{ text: user }] }],
+    generationConfig: { responseMimeType: "application/json", temperature: 0.6, maxOutputTokens: 4096 }
   });
+  let res;
+  for (let i = 0; i < models.length; i++) {
+    res = UrlFetchApp.fetch("https://generativelanguage.googleapis.com/v1beta/models/" + models[i] + ":generateContent", {
+      method: "post", contentType: "application/json", muteHttpExceptions: true,
+      headers: { "x-goog-api-key": key }, payload: payload
+    });
+    const code = res.getResponseCode();
+    if (code === 200) break;
+    if (code !== 503 && code !== 429) break;
+    console.log("[ai] " + models[i] + " answered " + code + ", trying again");
+    if (i < models.length - 1) Utilities.sleep(4000);
+  }
   if (res.getResponseCode() !== 200) throw new Error("Gemini " + res.getResponseCode() + ": " + res.getContentText().slice(0, 200));
   const text = JSON.parse(res.getContentText()).candidates[0].content.parts[0].text;
   return JSON.parse(text);
@@ -768,7 +779,11 @@ function secret_() {
 function sign_(msg) {
   return Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(msg, secret_())).replace(/=+$/, "");
 }
-function appUrl_() { return PropertiesService.getScriptProperties().getProperty("WEBAPP_URL") || ScriptApp.getService().getUrl(); }
+function appUrl_() {
+  // The editor returns the private /dev address, which clients cannot open. Always use /exec.
+  const url = PropertiesService.getScriptProperties().getProperty("WEBAPP_URL") || ScriptApp.getService().getUrl();
+  return String(url).replace(/\/dev$/, "/exec");
+}
 function reviewLink_(id, ch) {
   const exp = Date.now() + LINK_TTL_DAYS * 86400000;
   return appUrl_() + "?action=review&id=" + id + "&ch=" + ch + "&exp=" + exp + "&sig=" + sign_(id + "|" + ch + "|" + exp);
@@ -799,12 +814,13 @@ function sendReviewEmail_(r, draft, research, stats) {
   body += mailSection_("Cosa ha scritto", mailQuote_(r.descrizione));
 
   if (research) {
-    body += mailSection_("Cosa ho trovato", mailTable_([
+    const found = mailTable_([
       ["Sito", web ? esc_(web.title || web.url) : ""], ["Descrizione sito", web ? esc_(web.description) : ""],
       ["Google Maps", research.maps ? esc_(research.maps.name || research.maps.url) : ""],
       ["Telefoni trovati", esc_(phones.join(", "))], ["Email trovate", esc_(research.emails.join(", "))],
       ["Social", esc_(research.socials.join(", "))]
-    ]) || "");
+    ]);
+    if (found) body += mailSection_("Cosa ho trovato", found);
   }
   if (draft.lowInfo) {
     body += mailSection_("Descrizione troppo breve", '<p style="margin:0;">Sotto 200 caratteri o poco concreta: non ho chiamato l\'IA. Ti propongo un messaggio per chiedere dettagli.</p>');
@@ -828,7 +844,7 @@ function sendReviewEmail_(r, draft, research, stats) {
   MailApp.sendEmail({
     to: NOTIFY_EMAIL,
     subject: (draft.lowInfo ? "Servono dettagli · " : "Bozza pronta · ") + r.id + " · " + r.nome,
-    body: "Bozza per " + r.id + " (" + r.nome + "). Apri l'email in HTML per rivedere e approvare.\n\n" + draft.email.subject + "\n\n" + draft.email.body,
+    body: "Bozza per " + r.id + " (" + r.nome + "). Apri l'email in HTML per rivedere e approvare.\n\n" + draft.email.subject + "\n\n" + draft.email.body.replace(/\{\{DEMO_URL\}\}/g, demoUrl || ""),
     htmlBody: mailShell_({ preheader: "Rivedi e approva: " + r.nome, title: (draft.lowInfo ? "Servono più dettagli" : "Bozza pronta") + " · " + r.id,
       subtitle: r.nome + (r.attivita ? " · " + r.attivita : ""), body: body, footer: foot || "SmartRoutine Studio" }),
     name: "SmartRoutine Studio · Bozze"

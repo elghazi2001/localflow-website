@@ -15,8 +15,8 @@ window.SR_CONFIG = {
    * When empty, the form uses Web3Forms directly.
    */
   /** GoatCounter site code (free visit stats). Leave empty to disable. */
-  goatcounterCode: "",
+  goatcounterCode: "smartroutine",
 
-  requestEndpoint: "",
+  requestEndpoint: "https://script.google.com/macros/s/AKfycbyuVMes__uQcCYQ_LTsQKDW-lIjfL4F1cW3jrcd2tZtiNIM9YWJWJoQ3pz-2J55rjI/exec",
   submitCooldownMs: 30000
 };

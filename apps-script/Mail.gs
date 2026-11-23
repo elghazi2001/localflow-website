@@ -40,6 +40,7 @@ function mailTable_(rows) {
     return '<tr><td style="padding:9px 12px;width:150px;background:' + MAIL.soft + ';color:' + MAIL.muted + ';font-size:13px;border-bottom:1px solid ' + MAIL.line + ';vertical-align:top;">' + esc_(r[0]) + '</td>' +
       '<td style="padding:9px 12px;font-size:14px;border-bottom:1px solid ' + MAIL.line + ';">' + r[1] + '</td></tr>';
   }).join("");
+  if (!body) return "";
   return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ' + MAIL.line + ';border-radius:10px;border-collapse:separate;overflow:hidden;">' + body + '</table>';
 }
 

@@ -30,16 +30,26 @@ function geminiJson_(system, user) {
   if (aiBudgetLeft_() <= 0) throw new Error("Limite giornaliero di chiamate AI raggiunto.");
   props.setProperty("AI_COUNT", String(Number(props.getProperty("AI_COUNT") || 0) + 1));
 
-  const model = props.getProperty("GEMINI_MODEL") || "gemini-2.5-flash";
-  const res = UrlFetchApp.fetch("https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent", {
-    method: "post", contentType: "application/json", muteHttpExceptions: true,
-    headers: { "x-goog-api-key": key },
-    payload: JSON.stringify({
-      systemInstruction: { parts: [{ text: system }] },
-      contents: [{ role: "user", parts: [{ text: user }] }],
-      generationConfig: { responseMimeType: "application/json", temperature: 0.6, maxOutputTokens: 4096 }
-    })
+  // Main model twice (a 503 is usually a short spike), then a backup model once.
+  const main = props.getProperty("GEMINI_MODEL") || "gemini-3.8-flash";
+  const models = [main, main, "gemini-3.6-flash"];
+  const payload = JSON.stringify({
+    systemInstruction: { parts: [{ text: system }] },
+    contents: [{ role: "user", parts: [{ text: user }] }],
+    generationConfig: { responseMimeType: "application/json", temperature: 0.6, maxOutputTokens: 4096 }
   });
+  let res;
+  for (let i = 0; i < models.length; i++) {
+    res = UrlFetchApp.fetch("https://generativelanguage.googleapis.com/v1beta/models/" + models[i] + ":generateContent", {
+      method: "post", contentType: "application/json", muteHttpExceptions: true,
+      headers: { "x-goog-api-key": key }, payload: payload
+    });
+    const code = res.getResponseCode();
+    if (code === 200) break;
+    if (code !== 503 && code !== 429) break;
+    console.log("[ai] " + models[i] + " answered " + code + ", trying again");
+    if (i < models.length - 1) Utilities.sleep(4000);
+  }
   if (res.getResponseCode() !== 200) throw new Error("Gemini " + res.getResponseCode() + ": " + res.getContentText().slice(0, 200));
   const text = JSON.parse(res.getContentText()).candidates[0].content.parts[0].text;
   return JSON.parse(text);

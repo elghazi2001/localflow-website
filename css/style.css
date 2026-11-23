@@ -130,6 +130,11 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .about { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
 .about p { font-size: 20px; margin-bottom: 18px; }
 .about .button { margin-top: 12px; }
+.about-person { display: flex; align-items: center; gap: 20px; margin-bottom: 28px; }
+.about-person img { width: 120px; height: 120px; flex: none; border-radius: 50%; object-fit: cover; border: 3px solid var(--pink); box-shadow: 0 10px 30px -10px rgba(255, 61, 139, .6); }
+.about-person figcaption { display: flex; flex-direction: column; gap: 4px; }
+.about-person strong { font: 800 28px/1 var(--font-display); text-transform: uppercase; letter-spacing: .01em; color: var(--text); }
+.about-person span { font-size: 16px; color: var(--teal); }
 
 /* Contact */
 .contact { background: linear-gradient(180deg, var(--night) 0%, #2B0F55 100%); }
@@ -255,6 +260,11 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .term-live i { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); animation: blink 1.6s ease-in-out infinite; }
 .term-body { padding: 20px 20px 22px; font: 400 14.5px/1.55 var(--font-mono); min-height: 244px; }
 .term-body p { color: var(--text); margin: 0 0 9px; opacity: 0; animation: typein .01s linear forwards; animation-delay: var(--d, 0s); }
+.term-body p:nth-child(2) { --d: .9s; }
+.term-body p:nth-child(3) { --d: 1.6s; }
+.term-body p:nth-child(4) { --d: 2.3s; }
+.term-body p:nth-child(5) { --d: 3s; }
+.term-body p:nth-child(6) { --d: 3.8s; }
 .t-cmd::before { content: "$ "; color: var(--pink); }
 .t-ok b { display: inline-block; min-width: 2.4em; color: var(--teal); font-weight: 500; }
 .t-done { color: var(--orange) !important; margin-top: 14px !important; }
