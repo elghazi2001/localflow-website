@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /mockup.html
+
+Sitemap: https://elghazi2001.github.io/localflow-website/sitemap.xml

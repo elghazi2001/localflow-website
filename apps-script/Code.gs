@@ -17,8 +17,8 @@ const MOCKUP_BASE_URL = "https://elghazi2001.github.io/localflow-website/mockup.
 const SITE_URL = "https://elghazi2001.github.io/localflow-website/";
 
 const LIMITS = {
-  name: 100, business: 120, email: 254, phone: 30, business_type: 60,
-  service_interest: 80, budget_range: 60, contact_preference: 30,
+  name: 100, business: 120, email: 254, phone: 30,
+  service_interest: 80, preferred_time: 40,
   problem_description: 3000
 };
 const PER_EMAIL_COOLDOWN_S = 60;    // one request per email per minute
@@ -175,10 +175,8 @@ function appendToDoc_(id, r) {
     ["Email", r.email],
     ["Telefono", dash(r.phone)],
     ["Attività", dash(r.business)],
-    ["Tipo attività", dash(r.business_type)],
     ["Servizio", dash(r.service_interest)],
-    ["Budget", dash(r.budget_range)],
-    ["Contatto preferito", dash(r.contact_preference)],
+    ["Quando contattarlo", dash(r.preferred_time)],
     ["Descrizione", r.problem_description]
   ];
   const table = body.insertTable(i++, rows);
@@ -201,7 +199,23 @@ function esc_(v) {
     .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
+/**
+ * Emails this account can still send today (Google enforces a daily cap).
+ * Returns the number left after the one being sent now, or null if unknown,
+ * in which case nothing is printed.
+ */
+function remainingEmails_() {
+  try {
+    const left = MailApp.getRemainingDailyQuota();
+    return typeof left === "number" && isFinite(left) ? Math.max(left - 1, 0) : null;
+  } catch (err) {
+    return null;
+  }
+}
+
 function sendEmail_(id, r, docUrl) {
+  const left = remainingEmails_();
+  const quotaText = left === null ? "" : "Email rimaste oggi: " + left;
   const when = Utilities.formatDate(new Date(), "Europe/Rome", "dd/MM/yyyy 'alle' HH:mm");
   const phoneDigits = r.phone.replace(/[^0-9]/g, "");
   const replySubject = encodeURIComponent("Re: la tua richiesta a SmartRoutine Studio (" + id + ")");
@@ -236,14 +250,11 @@ function sendEmail_(id, r, docUrl) {
     '<tr><td style="padding:20px 26px 4px;">' +
     '<span style="display:inline-block;background:#EFEAFF;color:#4B3BA8;border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600;margin:0 6px 6px 0;">' +
     esc_(r.service_interest || "Servizio non indicato") + '</span>' +
-    '<span style="display:inline-block;background:#E9F8EF;color:#1B7A44;border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600;margin:0 6px 6px 0;">Budget: ' +
-    esc_(r.budget_range || "n.d.") + '</span>' +
-    '<span style="display:inline-block;background:#FFF4E5;color:#9A5B00;border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600;margin:0 6px 6px 0;">Preferisce: ' +
-    esc_(r.contact_preference || "n.d.") + '</span></td></tr>' +
+    '<span style="display:inline-block;background:#FFF4E5;color:#9A5B00;border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600;margin:0 6px 6px 0;">Contattalo: ' +
+    esc_(r.preferred_time || "quando vuoi") + '</span></td></tr>' +
     '<tr><td style="padding:12px 26px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" ' +
     'style="border:1px solid #ECE8FF;border-radius:10px;overflow:hidden;">' +
-    row("Email", r.email) + row("Telefono", r.phone) + row("Attività", r.business) +
-    row("Tipo di attività", r.business_type) + '</table></td></tr>' +
+    row("Email", r.email) + row("Telefono", r.phone) + row("Attività", r.business) + '</table></td></tr>' +
     '<tr><td style="padding:8px 26px;"><div style="font-size:13px;font-weight:700;color:#4B3BA8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Descrizione del problema</div>' +
     '<div style="background:#FAFAFD;border-left:4px solid #6D4AFF;border-radius:6px;padding:14px 16px;font-size:14px;line-height:1.6;color:#1F1D2B;white-space:pre-wrap;">' +
     esc_(r.problem_description) + '</div></td></tr>' +
@@ -254,17 +265,19 @@ function sendEmail_(id, r, docUrl) {
     button(mockupUrl, "✨ Genera mockup del servizio", "#1F1D2B", "#FFFFFF") + '</div></td></tr>' +
     '<tr><td style="padding:14px 26px;background:#FAF9FD;color:#8B899C;font-size:12px;border-top:1px solid #EEECF5;">' +
     'Inviata dal modulo di <a href="' + esc_(SITE_URL) + '" style="color:#6D4AFF;">SmartRoutine Studio</a>. ' +
-    'Rispondendo a questa email scrivi direttamente al cliente.</td></tr>' +
+    'Rispondendo a questa email scrivi direttamente al cliente.' +
+    (quotaText ? '<br><strong>' + esc_(quotaText) + '</strong> (limite giornaliero di Google)' : '') +
+    '</td></tr>' +
     '</table></div>';
 
   const text = [
     "Nuova richiesta " + id + " — " + when,
     "Nome: " + r.name, "Email: " + r.email, "Telefono: " + (r.phone || "-"),
-    "Attività: " + (r.business || "-") + " (" + (r.business_type || "-") + ")",
-    "Servizio: " + (r.service_interest || "-"), "Budget: " + (r.budget_range || "-"),
-    "Contatto preferito: " + (r.contact_preference || "-"), "", r.problem_description, "",
+    "Attività: " + (r.business || "-"),
+    "Servizio: " + (r.service_interest || "-"),
+    "Quando contattarlo: " + (r.preferred_time || "-"), "", r.problem_description, "",
     "Registro: " + docUrl
-  ].join("\n");
+  ].concat(quotaText ? ["", quotaText] : []).join("\n");
 
   MailApp.sendEmail({
     to: NOTIFY_EMAIL,

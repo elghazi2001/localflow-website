@@ -234,3 +234,15 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .pipe-steps::after { top: 14px; }
   * { transition: none !important; }
 }
+
+/* FAQ */
+.faq { max-width: 760px; }
+.faq h2 { margin-bottom: 28px; }
+.faq-list { border-top: 2px solid var(--ink); }
+.faq details { border-bottom: 1px solid var(--line); padding: 18px 4px; }
+.faq summary { cursor: pointer; font: 700 19px var(--font-display); letter-spacing: -0.01em; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; color: var(--signal); font-size: 24px; line-height: 1; }
+.faq details[open] summary::after { content: "–"; }
+.faq details p { margin-top: 10px; font-size: 17px; }
+.form-group label small { font-weight: 400; color: var(--muted); }
