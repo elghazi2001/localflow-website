@@ -13,8 +13,7 @@
   const MIN_FILL_MS = 3000;
   const REQUEST_TIMEOUT_MS = 20000;
   const FIELDS = [
-    "name", "business", "email", "phone", "business_type",
-    "service_interest", "budget_range", "contact_preference", "problem_description"
+    "name", "business", "email", "service_interest", "problem_description"
   ];
 
   let formShownAt = Date.now();
@@ -175,14 +174,10 @@
       "[INFORMAZIONI DI CONTATTO]",
       `• Nome: ${value("name")}`,
       `• Email: ${value("email")}`,
-      `• Telefono: ${value("phone")}`,
       `• Attività: ${value("business")}`,
-      `• Tipo Attività: ${value("business_type")}`,
       "",
       "[DETTAGLI RICHIESTA]",
       `• Servizio di Interesse: ${value("service_interest")}`,
-      `• Budget Orientativo: ${value("budget_range")}`,
-      `• Contatto Preferito: ${value("contact_preference")}`,
       "",
       "[DESCRIZIONE DEL PROBLEMA / ESIGENZA]",
       value("problem_description"),
