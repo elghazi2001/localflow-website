@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const waMsg = encodeURIComponent(config.whatsappDefaultMessage || "Ciao SmartRoutine Studio!");
   const waURL = `https://wa.me/${waNum}?text=${waMsg}`;
 
-  ["contactWhatsappBtn", "finalWhatsappBtn", "footerWhatsappLink", "floatingWhatsapp"].forEach(id => {
+  ["contactWhatsappBtn", "formWhatsappLink", "finalWhatsappBtn", "footerWhatsappLink", "floatingWhatsapp"].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.href = waURL;
   });

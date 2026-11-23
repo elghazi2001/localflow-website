@@ -295,3 +295,25 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .term-body p { opacity: 1; animation: none; }
   .caret, .term-live i { animation: none; }
 }
+
+/* Conversion details */
+.hero-reassure { margin-top: 18px; font-size: 15px; color: var(--text); opacity: .85; max-width: 34em; text-shadow: 0 1px 10px rgba(10, 2, 24, .8); }
+.form-alt { text-align: center; font-size: 15px; }
+.form-alt a { color: var(--orange); font-weight: 600; }
+
+.demo { background: linear-gradient(180deg, var(--night) 0%, #24104A 100%); }
+.demo-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 64px; align-items: center; }
+.demo-copy p { font-size: 20px; margin: 18px 0 14px; }
+.demo-copy .button { margin-top: 14px; }
+.phone { width: min(380px, 100%); justify-self: center; background: #fff; color: #1F1B2E; border-radius: 28px; overflow: hidden; box-shadow: 0 0 0 8px rgba(255, 255, 255, .06), 0 30px 70px -20px rgba(0, 0, 0, .8), 0 0 60px -10px rgba(255, 61, 139, .5); }
+.phone-top { padding: 22px; background: var(--sunset); color: #fff; }
+.phone-top strong { display: block; font: 900 26px var(--font-display); text-transform: uppercase; letter-spacing: .02em; }
+.phone-top span { font-size: 14px; opacity: .95; }
+.phone-body { padding: 8px 20px 22px; }
+.phone-h { margin: 16px 0 8px; font-size: 14px; font-weight: 600; color: #6B6580; }
+.opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.opts .opt { font: 500 15px var(--font-body); padding: 10px 14px; border-radius: 12px; border: 1.5px solid #E8E3F2; background: #FAF8FD; color: #1F1B2E; cursor: pointer; }
+.opts .opt.on { border-color: var(--pink); background: #FFF0F6; }
+.phone-go { width: 100%; margin-top: 20px; padding: 14px; border: 0; border-radius: 999px; background: var(--pink); color: #fff; font: 700 16px var(--font-body); cursor: pointer; }
+.phone-ok { margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: #E9F8EF; color: #1B6B3E; font-size: 14.5px; font-weight: 500; }
+@media (max-width: 992px) { .demo-grid { grid-template-columns: 1fr; gap: 40px; } }
