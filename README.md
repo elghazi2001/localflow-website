@@ -1,6 +1,6 @@
-# SmartRoutine Studio — Complete Frontend Redesign
+# SmartRoutine Studio
 
-Official production-ready frontend for **SmartRoutine Studio**, an independent custom software, automation, and practical AI studio for small business owners.
+Website of **SmartRoutine Studio**, an independent software developer in Pavia who builds websites, automations and practical AI tools for small businesses. Static site on GitHub Pages, with a Google Apps Script back end for the contact form.
 
 ## 📁 Project Structure
 
@@ -8,7 +8,7 @@ Official production-ready frontend for **SmartRoutine Studio**, an independent c
 SmartRoutine-Studio/
 ├── index.html              # Main semantic HTML5 file (Italian)
 ├── mockup.html             # Placeholder for the future mockup generator
-├── apps-script/            # Google Apps Script: Doc log + HTML email
+├── apps-script/            # Google Apps Script: Sheet log, HTML email, AI drafts with approval
 ├── README.md               # Documentation & setup guide
 ├── sitemap.xml, robots.txt # SEO files
 ├── assets/
@@ -44,9 +44,10 @@ window.SR_CONFIG = {
 ## ✉️ Request Delivery
 
 1. **Primary — Google Apps Script** (`apps-script/Code.gs`, deploy guide in `apps-script/README.md`):
-   logs every request in the Google Doc *"Richieste SmartRoutine Studio"* (newest on top, with ID and status)
-   and sends an HTML email with the details, reply/WhatsApp/Doc buttons and a **"Genera mockup del servizio"**
-   button (links to the `mockup.html` placeholder, to be developed).
+   saves every request as a row in the Google Sheet *"Richieste SmartRoutine Studio"* (with ID and status)
+   and sends you an HTML email with the details and reply/WhatsApp/Sheet buttons. If the email fails, the
+   request is still saved and the visitor still sees a success message. Every 15 minutes the queue prepares an
+   AI draft that is sent to you only; nothing reaches the client before you confirm.
 2. **Fallback — Web3Forms**: if the Apps Script is not configured or unreachable, the form sends the
    plain-text email through Web3Forms so no request is lost. Reply-To is set to the customer's email.
 

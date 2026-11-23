@@ -2,11 +2,11 @@
 
 // ===== Code.gs =====
 /**
- * SmartRoutine Studio — Request receiver (Google Apps Script Web App)
+ * SmartRoutine Studio: request receiver (Google Apps Script Web App)
  *
  * For every contact-form submission it:
  *   1. validates and sanitises the data (length limits, honeypot, rate limit)
- *   2. logs the request in a Google Doc ("Richieste SmartRoutine Studio")
+ *   2. saves the request as a new row in the Google Sheet "Richieste SmartRoutine Studio"
  *   3. sends an HTML notification email to NOTIFY_EMAIL
  *
  * Deploy: see apps-script/README.md
@@ -14,7 +14,6 @@
 
 // ---------- Settings ----------
 const NOTIFY_EMAIL = "elghazifarouk112@gmail.com";
-const DOC_NAME = "Richieste SmartRoutine Studio";
 // Placeholder page for the future "Genera mockup del servizio" feature.
 const MOCKUP_BASE_URL = "https://elghazi2001.github.io/localflow-website/mockup.html";
 const SITE_URL = "https://elghazi2001.github.io/localflow-website/";
@@ -47,12 +46,20 @@ function doPost(e) {
 
     // saveRequest_ takes the script lock itself (short, non-reentrant).
     const id = saveRequest_(req, "form", "");
-    const docUrl = appendToDoc_(id, req);
-    sendEmail_(id, req, docUrl);
+    console.log("[form] request " + id + " saved");
+
+    // The request is already stored. If the notification fails, the visitor must not
+    // see an error (they would send it twice); the 15-minute queue still picks it up.
+    try {
+      sendEmail_(id, req, sheetUrl_());
+      console.log("[mail] notification sent for " + id);
+    } catch (mailErr) {
+      console.error("[mail] notification failed for " + id + ": " + mailErr);
+    }
 
     return json_({ success: true, id: id });
   } catch (err) {
-    console.error(err);
+    console.error("[form] failed: " + err + (err && err.stack ? "\n" + err.stack : ""));
     return json_({ success: false, message: "Errore interno." });
   }
 }
@@ -64,10 +71,15 @@ function doGet(e) {
   return json_({ ok: true, service: "SmartRoutine request receiver" });
 }
 
-/** Run once from the editor to authorise and create the Doc. */
-function setup() {
-  const doc = getDoc_();
-  console.log("Doc pronto: " + doc.getUrl());
+/** Editor test: runs the form path with a fake request and prints the answer or the error. */
+function testForm() {
+  const fake = {
+    name: "Test Modulo", business: "Prova", email: "test.modulo@example.com", phone: "", website: "",
+    service_interest: "Automazione o pipeline", preferred_time: "",
+    problem_description: "Prova tecnica del modulo di contatto, serve solo a controllare che salvataggio ed email funzionino. ".repeat(3),
+    consent: true
+  };
+  console.log(doPost({ postData: { contents: JSON.stringify(fake) } }).getContent());
 }
 
 // ---------- Validation ----------
@@ -132,65 +144,12 @@ function rateLimit_(email) {
   }
 }
 
-// ---------- Google Doc ----------
-function getDoc_() {
-  const props = PropertiesService.getScriptProperties();
-  const id = props.getProperty("DOC_ID");
-  if (id) {
-    try { return DocumentApp.openById(id); } catch (e) { /* recreate below */ }
-  }
-  const doc = DocumentApp.create(DOC_NAME);
-  const body = doc.getBody();
-  body.clear();
-  body.getParagraphs()[0].setText(DOC_NAME).setHeading(DocumentApp.ParagraphHeading.TITLE);
-  body.appendParagraph("Ogni nuova richiesta dal sito viene aggiunta qui sotto (la più recente in alto). " +
-    "Aggiorna il campo \"Stato\" (Nuova → Contattato → Preventivo → Chiuso) man mano che procedi.")
-    .setHeading(DocumentApp.ParagraphHeading.NORMAL).setItalic(true);
-  body.appendParagraph("").appendHorizontalRule();
-  props.setProperty("DOC_ID", doc.getId());
-  return doc;
-}
-
+// ---------- Request ids ----------
 function nextId_() {
   const props = PropertiesService.getScriptProperties();
   const n = Number(props.getProperty("LAST_ID") || 0) + 1;
   props.setProperty("LAST_ID", String(n));
   return "R-" + ("0000" + n).slice(-4);
-}
-
-function appendToDoc_(id, r) {
-  const doc = getDoc_();
-  const body = doc.getBody();
-  const when = Utilities.formatDate(new Date(), "Europe/Rome", "dd/MM/yyyy HH:mm");
-  const dash = function (v) { return v || "—"; };
-
-  // Insert after title, intro and rule (index 3) so newest is on top.
-  let i = 3;
-  const h = body.insertParagraph(i++, id + " · " + r.name + (r.business ? " — " + r.business : ""));
-  h.setHeading(DocumentApp.ParagraphHeading.HEADING2).setItalic(false);
-  body.insertParagraph(i++, "Ricevuta il " + when + "   |   Stato: Nuova")
-    .setHeading(DocumentApp.ParagraphHeading.NORMAL).setItalic(true).setBold(false);
-
-  const rows = [
-    ["Email", r.email],
-    ["Telefono", dash(r.phone)],
-    ["Sito / Maps", dash(r.website)],
-    ["Attività", dash(r.business)],
-    ["Servizio", dash(r.service_interest)],
-    ["Quando contattarlo", dash(r.preferred_time)],
-    ["Descrizione", r.problem_description]
-  ];
-  const table = body.insertTable(i++, rows);
-  table.setBorderColor("#D9D4F5");
-  for (let row = 0; row < table.getNumRows(); row++) {
-    const label = table.getRow(row).getCell(0);
-    label.setBackgroundColor("#F3F0FF").setWidth(140);
-    label.editAsText().setBold(true).setItalic(false).setForegroundColor("#3B2A99");
-    table.getRow(row).getCell(1).editAsText().setBold(false).setItalic(false);
-  }
-  body.insertParagraph(i++, "").appendHorizontalRule();
-  doc.saveAndClose();
-  return doc.getUrl();
 }
 
 // ---------- Email ----------
@@ -214,7 +173,7 @@ function remainingEmails_() {
   }
 }
 
-function sendEmail_(id, r, docUrl) {
+function sendEmail_(id, r, sheetUrl) {
   const left = remainingEmails_();
   const when = Utilities.formatDate(new Date(), "Europe/Rome", "dd/MM/yyyy 'alle' HH:mm");
   const phoneDigits = r.phone.replace(/[^0-9]/g, "");
@@ -227,12 +186,12 @@ function sendEmail_(id, r, docUrl) {
   body += mailSection_("Cosa ha scritto", mailQuote_(r.problem_description));
   let buttons = mailButton_("mailto:" + r.email + "?subject=" + replySubject, "Rispondi", "primary");
   if (phoneDigits.length >= 8) buttons += mailButton_("https://wa.me/" + phoneDigits, "WhatsApp", "secondary");
-  buttons += mailButton_(docUrl, "Registro richieste", "secondary");
+  buttons += mailButton_(sheetUrl, "Registro richieste", "secondary");
   body += '<div style="margin:6px 0 10px;">' + buttons + '</div>' +
     '<p style="margin:0 0 16px;font-size:13px;color:' + MAIL.muted + ';">Entro 15 minuti ricevi una seconda email con la bozza di risposta da approvare.</p>';
 
   const text = ["Nuova richiesta " + id + " — " + when, "Nome: " + r.name, "Email: " + r.email, "Telefono: " + (r.phone || "-"),
-    "Servizio: " + (r.service_interest || "-"), "Sito/Maps: " + (r.website || "-"), "", r.problem_description, "", "Registro: " + docUrl
+    "Servizio: " + (r.service_interest || "-"), "Sito/Maps: " + (r.website || "-"), "", r.problem_description, "", "Registro: " + sheetUrl
   ].concat(left === null ? [] : ["", "Email rimaste oggi: " + left]).join("\n");
 
   MailApp.sendEmail({
@@ -646,6 +605,10 @@ function getSheet_() {
     ss.getSheets()[0].setFrozenRows(1);
   }
   return ss.getSheets()[0];
+}
+
+function sheetUrl_() {
+  return getSheet_().getParent().getUrl();
 }
 
 function readRows_() {

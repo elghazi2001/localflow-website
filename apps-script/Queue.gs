@@ -25,6 +25,10 @@ function getSheet_() {
   return ss.getSheets()[0];
 }
 
+function sheetUrl_() {
+  return getSheet_().getParent().getUrl();
+}
+
 function readRows_() {
   const sh = getSheet_();
   const last = sh.getLastRow();

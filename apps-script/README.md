@@ -1,12 +1,13 @@
 # Request receiver — deploy guide (≈5 minutes)
 
-This Google Apps Script receives contact-form submissions, logs each one in the Google Doc
+This Google Apps Script receives contact-form submissions, saves each one as a row in the Google Sheet
 **"Richieste SmartRoutine Studio"** (created automatically in your Drive) and emails you a formatted HTML notification.
 
 1. Open <https://script.google.com> (signed in as the Gmail account that should receive requests) → **New project**.
 2. Delete the sample code and paste the whole content of **`dist/SmartRoutine.gs`** (one file, everything included; rebuilt with `./build.sh` from the module files). Rename the project "SmartRoutine Requests", save (Ctrl+S).
-3. In the function dropdown pick **`setup`** → **Run** → **Review permissions** → choose your account → *Advanced* → *Go to SmartRoutine Requests* → **Allow**.
-   (Permissions requested: create/edit the Doc, send email as you, temporary cache.) The log shows the Doc link.
+3. In the function dropdown pick **`installTrigger`** → **Run** → **Review permissions** → choose your account → *Advanced* → *Go to SmartRoutine Requests* → **Allow**.
+   (Permissions requested: Sheets, Gmail, send email as you, external requests.) The log shows the Sheet link.
+   To check the form path without the website, run **`testForm`**: it saves a fake request and prints the result.
 4. **Deploy → New deployment** → type **Web app** → *Execute as*: **Me** → *Who has access*: **Anyone** → **Deploy**.
 5. Copy the **Web app URL** (`https://script.google.com/macros/s/…/exec`) into `requestEndpoint` in `js/config.js`.
 
@@ -19,7 +20,7 @@ Updating the code later: **Deploy → Manage deployments → ✏ → Version: Ne
 - The global counter uses Script Properties and a script lock so concurrent submissions cannot all pass using the same stale count. Cache-based per-email cooldowns can still expire early and are not a durable identity control.
 - The web app is publicly callable (required for a public static form). Do not treat a shared value embedded in JavaScript as authentication.
 - Configure a server-verified CAPTCHA/Turnstile check and a rate-limiting proxy/WAF before relying on this endpoint for production traffic.
-- The script only runs as you and can only touch the Doc it created and send mail to `NOTIFY_EMAIL`.
+- The script only runs as you and can only touch the Sheet it created, your Gmail, and send mail to you (and to a client only after you confirm).
 
 ## AI drafts with your approval (free)
 
