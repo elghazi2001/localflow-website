@@ -1,0 +1,107 @@
+/*
+ * Proposal pages (one static page per request, shared styles).
+ * Concept: a bar's order slip and menu board. The live demo opens the page,
+ * the costs are laid out like a menu with dotted leaders.
+ */
+:root {
+  --notte: #14072B;
+  --carta: #F6F2FB;
+  --inchiostro: #1F1B2E;
+  --rosa: #FF3D8B;
+  --acqua: #0B7A6D;
+  --filo: #DCD4EC;
+  --muted: #5E5873;
+  --gesso: #FBF3FF;
+  --gesso-soft: #CBBEE3;
+  --display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --body: "Outfit", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--carta); color: var(--inchiostro); font: 400 17px/1.6 var(--body); }
+img { max-width: 100%; display: block; }
+p { max-width: 62ch; margin: 0 0 14px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 900; line-height: 1; margin: 0; letter-spacing: 0.005em; }
+:focus-visible { outline: 3px solid var(--rosa); outline-offset: 3px; }
+
+.inner { width: min(1040px, 100% - 32px); margin-inline: auto; }
+
+/* ---------- Hero: headline and the live demo side by side ---------- */
+.hero { background: var(--notte); color: var(--gesso); padding: 22px 0 56px; }
+.hero .wordmark { display: flex; align-items: center; gap: 10px; margin: 0 0 36px; font: 900 1.5rem/1 var(--display); }
+.hero .wordmark::before { content: ""; width: 14px; height: 14px; border-radius: 4px; background: var(--rosa); }
+.hero-grid { display: grid; gap: 40px; align-items: center; }
+.hero h1 { font-size: clamp(2.5rem, 8.5vw, 4rem); max-width: 12ch; }
+.hero .lead { margin-top: 18px; color: var(--gesso-soft); font-size: 1.1rem; }
+@media (min-width: 860px) {
+  .hero-grid { grid-template-columns: 1.1fr 0.9fr; gap: 64px; }
+}
+
+/* Phone with the demo */
+.phone { width: min(330px, 100%); margin-inline: auto; background: var(--carta); color: var(--inchiostro);
+  border: 9px solid #0A0218; border-radius: 34px; box-shadow: 0 0 0 2px #3B2470; overflow: hidden; }
+.phone-head { padding: 20px 20px 14px; border-bottom: 1px solid var(--filo); }
+.phone-head strong { display: block; font: 900 1.7rem/1 var(--display); }
+.phone-head span { font-size: 0.9rem; color: var(--muted); }
+.phone-body { padding: 16px 20px 22px; }
+.phone-body h3 { font: 600 0.9rem/1.2 var(--body); color: var(--muted); margin: 16px 0 8px; letter-spacing: 0; }
+.phone-body h3:first-child { margin-top: 0; }
+.opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.opt { font: inherit; font-size: 0.95rem; color: var(--inchiostro); background: #fff; border: 1.5px solid var(--filo);
+  border-radius: 10px; padding: 9px 14px; min-height: 44px; cursor: pointer; }
+.opt.on { border-color: var(--inchiostro); background: var(--inchiostro); color: var(--gesso); }
+.go { width: 100%; margin-top: 20px; min-height: 48px; border: 0; border-radius: 999px; background: var(--rosa);
+  color: var(--notte); font: 600 1rem var(--body); cursor: pointer; }
+.go:hover { filter: brightness(1.06); }
+.ok { display: none; margin-top: 14px; padding: 12px 14px; border-left: 4px solid var(--acqua); background: #E5F4F1;
+  color: #0A4F46; font-size: 0.92rem; line-height: 1.45; }
+.ok.show { display: block; animation: arriva 0.25s ease-out; }
+@keyframes arriva { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.demo-note { margin: 14px auto 0; text-align: center; font-size: 0.85rem; color: var(--gesso-soft); max-width: 330px; }
+
+/* ---------- Paper sections ---------- */
+.block { padding: 56px 0 8px; }
+.block h2 { font-size: clamp(1.9rem, 5vw, 2.6rem); margin-bottom: 14px; }
+.block .intro { color: var(--muted); }
+
+/* Staff ledger */
+.ledger { width: 100%; border-collapse: collapse; margin-top: 8px; background: #fff; border: 1px solid var(--filo); }
+.ledger th, .ledger td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--filo); font-size: 0.97rem; }
+.ledger th { font-weight: 600; color: var(--muted); background: var(--carta); font-size: 0.88rem; }
+.ledger tr:last-child td { border-bottom: 0; }
+.stato-ok { color: var(--acqua); font-weight: 600; }
+.stato-wait { color: var(--inchiostro); font-weight: 600; box-shadow: inset 0 -3px 0 var(--rosa); }
+.ledger-note { margin: 10px 0 0; font-size: 0.85rem; color: var(--muted); }
+
+/* Steps: a real sequence */
+.steps { list-style: none; margin: 8px 0 0; padding: 0; counter-reset: passo; max-width: 62ch; }
+.steps li { counter-increment: passo; display: grid; grid-template-columns: 44px 1fr; gap: 6px; padding: 12px 0; border-top: 1px solid var(--filo); }
+.steps li::before { content: counter(passo); font: 900 2rem/1 var(--display); color: var(--inchiostro); }
+.steps li:last-child { border-bottom: 1px solid var(--filo); }
+
+/* ---------- Menu board: the costs ---------- */
+.board { margin-top: 56px; background: var(--notte); color: var(--gesso); padding: 56px 0 64px; }
+.board h2 { font-size: clamp(1.9rem, 5vw, 2.6rem); }
+.board .intro { color: var(--gesso-soft); margin-top: 12px; }
+.menu { display: grid; gap: 40px; margin-top: 36px; }
+@media (min-width: 860px) { .menu { grid-template-columns: 1fr 1fr; gap: 64px; } }
+.dish { padding-left: 18px; border-left: 2px solid #3B2470; }
+.dish.rec { border-left: 6px solid var(--rosa); padding-left: 16px; }
+@media (min-width: 860px) { .dish:not(.rec) { padding-top: calc(0.95rem * 1.6 + 6px); } }
+.dish .mark { margin: 0 0 6px; color: var(--rosa); font-weight: 600; font-size: 0.95rem; }
+.dish h3 { font-size: 2.1rem; margin-bottom: 12px; }
+.dish ul { margin: 0 0 18px; padding-left: 18px; color: var(--gesso-soft); max-width: 46ch; }
+.dish li { margin-bottom: 6px; }
+.leaders { margin: 0; }
+.leaders .row { display: flex; align-items: baseline; gap: 12px; padding: 5px 0; }
+.leaders dt { flex: 1 1 auto; display: flex; align-items: baseline; gap: 10px; font-weight: 600; white-space: nowrap; }
+.leaders dt::after { content: ""; flex: 1; border-bottom: 2px dotted #8A72C4; transform: translateY(-0.2em); min-width: 16px; }
+.leaders dd { margin: 0; flex: 0 1 auto; text-align: right; max-width: 58%; }
+.dish .fine { margin: 10px 0 0; font-size: 0.88rem; color: var(--gesso-soft); }
+.reco { margin: 40px 0 0; font-size: 1.05rem; max-width: 56ch; }
+
+/* ---------- Footer ---------- */
+.foot { padding: 28px 0 40px; color: var(--muted); font-size: 0.88rem; }
+.foot p { margin: 0; }
+
+@media (prefers-reduced-motion: reduce) { .ok.show { animation: none; } }

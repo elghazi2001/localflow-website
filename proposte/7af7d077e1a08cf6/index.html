@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<title>Proposta per Osteria della Madonna da Peo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&amp;family=Outfit:wght@400;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../css/proposta.css?v=4">
+</head>
+<body>
+
+<header class="hero">
+  <div class="inner">
+    <p class="wordmark">SmartRoutine Studio</p>
+    <div class="hero-grid">
+      <div>
+        <h1>Osteria della Madonna da Peo: prenotazioni online a qualsiasi ora</h1>
+        <p class="lead">Un'anteprima di come potrebbe funzionare, costruita su quello che mi hai scritto. I pulsanti della demo funzionano, provali.</p>
+      </div>
+      <div>
+        <div class="phone">
+          <div class="phone-head"><strong>Osteria della Madonna da Peo</strong><span>Prenota un tavolo</span></div>
+          <div class="phone-body">
+            <h3>Quante persone</h3>
+            <div class="opts"><button type="button" class="opt">2</button><button type="button" class="opt on">4</button><button type="button" class="opt">6</button><button type="button" class="opt">8 o più</button></div>
+            <h3>Giorno</h3>
+            <div class="opts"><button type="button" class="opt on">Venerdì</button><button type="button" class="opt">Sabato</button><button type="button" class="opt">Domenica</button></div>
+            <h3>Orario</h3>
+            <div class="opts"><button type="button" class="opt">19:30</button><button type="button" class="opt on">20:30</button><button type="button" class="opt">21:30</button></div>
+            <button type="button" class="go" id="go">Conferma prenotazione</button>
+            <div class="ok" id="ok" role="status">Prenotazione ricevuta. Ti arriva subito la conferma e, il giorno prima, un promemoria.</div>
+          </div>
+        </div>
+        <p class="demo-note">Demo illustrativa: non è attiva e non invia nulla.</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="block">
+    <div class="inner">
+      <h2>Cosa vede lo staff</h2>
+      <p class="intro">Ogni prenotazione arriva in un foglio condiviso, anche quando nessuno è al telefono o su Instagram. Lo staff vede subito quali tavoli sono presi e quali conferme sono già partite.</p>
+      <table class="ledger">
+        <thead><tr><th scope="col">Ora</th><th scope="col">Persone</th><th scope="col">Conferma</th><th scope="col">Promemoria</th></tr></thead>
+        <tbody>
+          <tr><td>20:30</td><td>4</td><td class="stato-ok">Inviata</td><td class="stato-wait">Il giorno prima</td></tr>
+          <tr><td>21:30</td><td>2</td><td class="stato-ok">Inviata</td><td class="stato-ok">Inviato</td></tr>
+        </tbody>
+      </table>
+      <p class="ledger-note">Esempio con dati inventati.</p>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="inner">
+      <h2>Come funziona</h2>
+      <ol class="steps">
+        <li>Il cliente prenota dal telefono quando vuole, anche di notte, senza aspettare una risposta.</li>
+        <li>Riceve subito la conferma della prenotazione.</li>
+        <li>Il giorno prima riceve un promemoria, così diminuiscono i tavoli prenotati e non occupati.</li>
+        <li>Lo staff vede tutto nel foglio condiviso e può cambiare o annullare una prenotazione.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="board">
+    <div class="inner">
+      <h2>Due modi per realizzarlo</h2>
+      <p class="intro">I costi degli strumenti sono indicativi, controllati il 23/11/2026. Prima di decidere si confermano sui siti dei fornitori.</p>
+      <div class="menu">
+        <article class="dish rec">
+          <p class="mark">Da cui partirei</p>
+          <h3>Gratuita, con Google</h3>
+          <ul>
+            <li>Modulo di prenotazione, foglio condiviso, conferma e promemoria inviati per email.</li>
+            <li>Nessun server né database da gestire.</li>
+            <li>Il promemoria arriva per email, non su WhatsApp o SMS. Google ha limiti giornalieri sulle email inviate.</li>
+          </ul>
+          <dl class="leaders">
+            <div class="row"><dt>Strumenti</dt><dd>0 euro al mese</dd></div>
+            <div class="row"><dt>Il mio lavoro</dt><dd>da concordare</dd></div>
+          </dl>
+          <p class="fine">Account Google normale. Avvio ed eventuale assistenza si definiscono dopo la chiamata, in base a cosa serve.</p>
+        </article>
+        <article class="dish">
+          <h3>A pagamento, con server e database</h3>
+          <ul>
+            <li>Un'app di prenotazione con calendario dei tavoli, conferme e promemoria anche per SMS o WhatsApp.</li>
+            <li>Più flessibile e personalizzabile, ma serve un server e qualcuno che lo tenga in ordine.</li>
+            <li>Il database può stare sullo stesso server, senza un costo in più.</li>
+          </ul>
+          <dl class="leaders">
+            <div class="row"><dt>Server piccolo</dt><dd>da 4 a 6 euro al mese</dd></div>
+            <div class="row"><dt>Il mio lavoro</dt><dd>avvio e canone mensile</dd></div>
+          </dl>
+          <p class="fine">Il server è intestato a voi, IVA esclusa. Gli SMS e i messaggi WhatsApp si pagano a messaggio, con un costo da verificare con il fornitore scelto. Costo di avvio una tantum e canone mensile di assistenza: cifre da definire dopo la chiamata.</p>
+        </article>
+      </div>
+      <p class="reco">Partirei dalla soluzione gratuita per vedere se la prenotazione online funziona per i vostri clienti. Se preferiscono il promemoria su WhatsApp o SMS, si passa alla seconda.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="inner"><p>Anteprima illustrativa, non è un servizio attivo. Farouk Elghazi, SmartRoutine Studio, Pavia. Per qualsiasi domanda rispondi alla mia email.</p></div>
+</footer>
+
+<script src="../../js/proposta.js?v=1"></script>
+</body>
+</html>
