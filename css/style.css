@@ -35,22 +35,22 @@ body {
   font-family: var(--font-body);
   font-size: 18px;
   line-height: 1.6;
-  background: var(--night);
-  color: var(--text);
+  background: var(--paper);
+  color: var(--ink);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
 
 .container { width: min(1120px, calc(100% - 32px)); margin: 0 auto; position: relative; z-index: 2; }
 
-h1, h2, h3 { font-family: var(--font-display); color: var(--text); line-height: 0.95; text-transform: uppercase; letter-spacing: 0.005em; font-weight: 900; }
-h1 { font-size: clamp(52px, 8vw, 104px); }
-h2 { font-size: clamp(42px, 6vw, 76px); }
-h3 { font-size: 28px; font-weight: 800; line-height: 1; }
-p { color: var(--muted); }
+h1, h2, h3 { font-family: var(--font-body); color: var(--ink); font-weight: 700; letter-spacing: -0.025em; line-height: 1.05; text-wrap: balance; }
+h1 { font-size: clamp(42px, 6.2vw, 80px); letter-spacing: -0.035em; }
+h2 { font-size: clamp(32px, 4.4vw, 52px); }
+h3 { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.25; }
+p { color: var(--ink-soft); }
 
 a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible {
-  outline: 3px solid var(--teal);
+  outline: 3px solid var(--green);
   outline-offset: 3px;
 }
 
@@ -69,13 +69,13 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .button-ghost { border-color: var(--text); color: var(--text); background: transparent; }
 .button-ghost:hover { background: var(--text); color: var(--night); }
 .button-whatsapp { background: var(--whatsapp); color: #05290F; font-weight: 700; }
-.button-outline { border-color: var(--line); color: var(--text); background: transparent; }
+.button-outline { border-color: var(--line); color: var(--ink); background: transparent; }
 
 /* Navbar */
 .navbar { position: fixed; inset: 0 0 auto 0; z-index: 1000; background: var(--night); border-bottom: 1px solid var(--line); }
 .nav-container { height: 68px; display: flex; align-items: center; justify-content: space-between; }
-.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font: 900 24px var(--font-display); text-transform: uppercase; letter-spacing: .02em; }
-.brand em { font-style: normal; font-weight: 700; color: var(--orange); }
+.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font: 700 19px var(--font-body); letter-spacing: -0.02em; }
+.brand em { font-style: normal; font-weight: 400; color: var(--ink-soft); }
 .nav-links { display: flex; align-items: center; gap: 28px; }
 .nav-links a:not(.button) { color: var(--muted); text-decoration: none; font-size: 16px; font-weight: 500; transition: color .2s; }
 .nav-links a:not(.button):hover { color: var(--text); }
